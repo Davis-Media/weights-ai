@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Weights AI
 
-## Getting Started
+*This project is built to showcase what kind of incredible stuff we can build with AI **ENHANCED** applications.*
 
-First, run the development server:
+### What is Weights AI?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+A simple weights tracker application that the user can interact with using text and conversation. For example you can say "I just benched a 225x5x5" and it would record that for you, then you can view it later.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- NextJS
+- Vercel AI SDK
+- Tailwind
+- Drizzle
+- Turso & Sqlite
+- OpenAI GPT-3.5
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### How to run
 
-## Learn More
+1. Clone the repository
+2. Run `pnpm install`
+3. Fill in the `.env.local` with your info
+4. Run `pnpm dev`
 
-To learn more about Next.js, take a look at the following resources:
+### Project Todo
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [] Create UI components
+- [] Data model
+- [] Connect components to backend
+- [] AI Interface
+- [] Use AI SDK to interact with the app

@@ -24,8 +24,8 @@ A simple weights tracker application that the user can interact with using text 
 
 ### Project Todo
 
-- [] Create UI components
-- [] Data model
-- [] Connect components to backend
-- [] AI Interface
-- [] Use AI SDK to interact with the app
+- [ ] Create UI components
+- [ ] Data model
+- [ ] Connect components to backend
+- [ ] AI Interface
+- [ ] Use AI SDK to interact with the app

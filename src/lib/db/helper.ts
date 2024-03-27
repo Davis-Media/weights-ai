@@ -1,7 +1,8 @@
 "use server";
+import "server-only";
 import { auth } from "@clerk/nextjs";
 import { db } from ".";
-import { workout } from "./schema";
+import { set, workout } from "./schema";
 import { generateId } from "../utils";
 import { eq } from "drizzle-orm";
 
@@ -43,4 +44,20 @@ export const getAllWorkouts = async () => {
   });
 
   return workouts;
+};
+
+export const getAllExercises = async (workoutId: string) => {
+  const { userId } = auth();
+
+  if (!userId) {
+    return [];
+  }
+
+  // TODO: ensure the user owns this workout
+
+  const exercises = await db.query.set.findMany({
+    where: eq(set.workoutId, workoutId),
+  });
+
+  return exercises;
 };

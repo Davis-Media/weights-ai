@@ -1,8 +1,17 @@
 import "server-only";
 import { OpenAI } from "openai";
-import { createAI, getMutableAIState, render } from "ai/rsc";
+import {
+  createAI,
+  createStreamableUI,
+  getMutableAIState,
+  render,
+} from "ai/rsc";
 import z from "zod";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
+import { SystemMessage } from "@/components/Messages";
+import ViewAllWorkouts from "@/components/ViewAllWorkouts";
+import { Suspense } from "react";
+import { TestRSC } from "@/components/TestRSC";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,17 +54,52 @@ async function submitUserMessage(userInput: string) {
           },
         ]);
       }
-      return <div>{content}</div>;
+      return <SystemMessage message={content} needsSep={true} />;
     },
     tools: {
+      view_all_workouts: {
+        description:
+          "Allow the user to view all of their past workouts in a nice table",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>fetching...</div>;
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "create_new_workout",
+              content: "provided the UI for the user to view their workouts",
+            },
+          ]);
+
+          // need to make this stream-able so that suspense works
+          const content = createStreamableUI(
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Here are all of your workouts!"
+              />
+              <div className="bg-blue-200 my-2">
+                <Suspense fallback={<div>LOADING TEST RSC</div>}>
+                  <TestRSC />
+                </Suspense>
+              </div>
+              <Suspense fallback={<div>Loading...</div>}>
+                <ViewAllWorkouts />
+              </Suspense>
+            </div>
+          );
+
+          return content.value;
+        },
+      },
       create_new_workout: {
         description:
           "Provide the user with the UI to create a new workout, and once it is created set it is the currently selected workout",
         parameters: z.object({}),
         render: async function* () {
           yield <div>LOADING...</div>;
-
-          // const house = await getHouses(limit)
 
           aiState.done([
             ...aiState.get(),
@@ -66,7 +110,15 @@ async function submitUserMessage(userInput: string) {
             },
           ]);
 
-          return <CreateWorkoutCard />;
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Lets get your workout info ready, once you submit, your workout will automatically start!"
+              />
+              <CreateWorkoutCard />
+            </div>
+          );
         },
       },
     },
@@ -87,12 +139,7 @@ const initialAIState: {
 const initialUIState: {
   id: number;
   display: React.ReactNode;
-}[] = [
-  {
-    id: 0,
-    display: <div>Hello! This is some sample init state...</div>,
-  },
-];
+}[] = [];
 
 export const AI = createAI({
   actions: {

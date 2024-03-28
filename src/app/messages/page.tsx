@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useUIState, useActions } from "ai/rsc";
 import type { AI } from "../action";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useUIState<typeof AI>();
-  const { submitUserMessage } = useActions<typeof AI>();
+  const { submitUserMessage } = useActions<typeof AI>() as {
+    // idk why TS is being dumb here but it is and I like my types
+    submitUserMessage: (message: string) => Promise<{
+      id: number;
+      display: ReactNode;
+    }>;
+  };
 
   return (
     <div>

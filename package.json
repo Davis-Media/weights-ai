@@ -21,6 +21,7 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@uploadthing/react": "^6.4.1",
     "ai": "^3.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -37,6 +38,7 @@
     "server-only": "^0.0.1",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "uploadthing": "^6.7.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

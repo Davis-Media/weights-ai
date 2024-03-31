@@ -13,6 +13,7 @@ import ViewAllWorkouts from "@/components/ViewAllWorkouts";
 import { Suspense } from "react";
 import { TestRSC } from "@/components/TestRSC";
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
+import { UploadProgressPic } from "@/components/UploadProgressPic";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -58,6 +59,34 @@ async function submitUserMessage(userInput: string) {
       return <SystemMessage message={content} needsSep={true} />;
     },
     tools: {
+      add_progress_picture: {
+        description:
+          "Allow the user to upload a progress picture of themselves for their workout",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>fetching...</div>;
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "add_progress_picture",
+              content:
+                "provided the UI for the user to upload a progress picture",
+            },
+          ]);
+
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Upload your progress photo here!"
+              />
+              <UploadProgressPic />
+            </div>
+          );
+        },
+      },
       add_sets: {
         description:
           "Allow the user to input their sets and add exercises to their currently active workout. You can pass in some init state if they give you info in their prompt.",

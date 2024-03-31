@@ -1,6 +1,7 @@
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import ExerciseCard from "@/components/ExerciseCard";
+import { UploadProgressPic } from "@/components/UploadProgressPic";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
 import { SignIn, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
@@ -15,7 +16,9 @@ export default async function Home() {
         <UserButton />
         <CreateWorkoutCard />
         <ViewAllWorkouts />
+        <UploadProgressPic />
       </SignedIn>
+
       <ExerciseCard />
       <AddExerciseCardServer initState={[]} />
     </main>

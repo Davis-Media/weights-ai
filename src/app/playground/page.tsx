@@ -1,4 +1,4 @@
-import AddExerciseCard from "@/components/AddExerciseCard";
+import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import ExerciseCard from "@/components/ExerciseCard";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
@@ -17,7 +17,7 @@ export default async function Home() {
         <ViewAllWorkouts />
       </SignedIn>
       <ExerciseCard />
-      <AddExerciseCard />
+      <AddExerciseCardServer initState={[]} />
     </main>
   );
 }

@@ -12,6 +12,7 @@ import { SystemMessage } from "@/components/Messages";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
 import { Suspense } from "react";
 import { TestRSC } from "@/components/TestRSC";
+import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -57,6 +58,59 @@ async function submitUserMessage(userInput: string) {
       return <SystemMessage message={content} needsSep={true} />;
     },
     tools: {
+      add_sets: {
+        description:
+          "Allow the user to input their sets and add exercises to their currently active workout. You can pass in some init state if they give you info in their prompt.",
+        parameters: z
+          .object({
+            initState: z.array(
+              z.object({
+                exercise: z
+                  .enum(["bench", "deadlift"])
+                  .describe("The exercise the user did"),
+                reps: z
+                  .number()
+                  .describe("The number of reps they did of that exercise"),
+                weight: z
+                  .number()
+                  .describe("The amount of weight that the user did"),
+              })
+            ),
+          })
+          .required(),
+        render: async function* (props) {
+          yield <div>fetching...</div>;
+
+          const test = JSON.parse(props as unknown as string);
+
+          console.log(test);
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "add_sets",
+              content:
+                "provided the UI for the user to add sets to their workout",
+            },
+          ]);
+
+          // need to make this stream-able so that suspense works
+          const content = createStreamableUI(
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Add your set here, once you are done go ahead and hit save!"
+              />
+              <Suspense fallback={<div>Loading...</div>}>
+                <AddExerciseCardServer initState={test.initState} />
+              </Suspense>
+            </div>
+          );
+
+          return content.value;
+        },
+      },
       view_all_workouts: {
         description:
           "Allow the user to view all of their past workouts in a nice table",
@@ -96,7 +150,7 @@ async function submitUserMessage(userInput: string) {
       },
       create_new_workout: {
         description:
-          "Provide the user with the UI to create a new workout, and once it is created set it is the currently selected workout",
+          "Provide the user with the UI to create a new workout, this is NOT for when the user wants to add an exercise like bench press",
         parameters: z.object({}),
         render: async function* () {
           yield <div>LOADING...</div>;

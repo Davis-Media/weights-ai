@@ -6,6 +6,36 @@ import { set, workout } from "./schema";
 import { generateId } from "../utils";
 import { and, eq } from "drizzle-orm";
 
+export const saveNewSets = async (
+  input: {
+    exercise: string;
+    reps: number;
+    weight: number;
+  }[]
+) => {
+  const workout = await getInProgressWorkout();
+
+  if (!workout) {
+    return {
+      error: "no selected workout :(",
+    };
+  }
+
+  const createInput = input.map((inputSet) => {
+    return {
+      id: generateId(50),
+      lift: inputSet.exercise,
+      weight: inputSet.weight,
+      reps: inputSet.reps,
+      workoutId: workout.id,
+    };
+  });
+
+  await db.insert(set).values(createInput);
+
+  return { error: null };
+};
+
 export const getInProgressWorkout = async () => {
   const { userId } = auth();
 

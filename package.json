@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push:sqlite --config=drizzle.config.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:dev": "turso dev --db-file local.db"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.9",

@@ -4,7 +4,50 @@ import { auth } from "@clerk/nextjs";
 import { db } from ".";
 import { set, workout } from "./schema";
 import { generateId } from "../utils";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+
+export const getInProgressWorkout = async () => {
+  const { userId } = auth();
+
+  if (!userId) {
+    return undefined;
+  }
+
+  const curWorkout = await db.query.workout.findFirst({
+    where: and(eq(workout.userId, userId), eq(workout.inProgress, true)),
+  });
+
+  return curWorkout;
+};
+
+export const setWorkoutInProgress = async (workoutId: string) => {
+  const { userId } = auth();
+
+  if (!userId) {
+    return {
+      error: "user is not logged in",
+    };
+  }
+
+  await db
+    .update(workout)
+    .set({
+      inProgress: false,
+    })
+    .where(eq(workout.userId, userId));
+
+  // TODO validate that the user owns this workout
+  await db
+    .update(workout)
+    .set({
+      inProgress: true,
+    })
+    .where(eq(workout.id, workoutId));
+
+  return {
+    error: null,
+  };
+};
 
 export const createWorkout = async (data: {
   date: Date;

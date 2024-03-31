@@ -4,7 +4,7 @@ import { useUIState, useActions } from "ai/rsc";
 import type { AI } from "../action";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SystemMessage, UserMessage } from "@/components/Messages";
+import { UserMessage } from "@/components/Messages";
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
@@ -33,45 +33,83 @@ export default function Page() {
         <div className="bg-white w-full h-[300px]"></div>
       </div>
 
-      <form
-        className="fixed z-30 bottom-12 md:w-1/2 bg-black py-2 px-6 rounded-full flex flex-row gap-4 left-1/2 -translate-x-1/2"
-        onSubmit={async (e) => {
-          e.preventDefault();
+      <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3">
+        <div className="flex flex-row gap-2 overflow-x-scroll no-scrollbar">
+          <Button
+            type="button"
+            variant={"outline"}
+            onClick={async (e) => {
+              e.preventDefault();
+              const message = "Show me all of my workouts";
+              // Add user message to UI state
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                {
+                  id: Date.now(),
+                  display: <UserMessage message={message} />,
+                },
+              ]);
 
-          // Add user message to UI state
-          setMessages((currentMessages) => [
-            ...currentMessages,
-            {
-              id: Date.now(),
-              display: <UserMessage message={inputValue} />,
-            },
-          ]);
+              // Submit and get response message
+              const responseMessage = await submitUserMessage(message);
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                responseMessage,
+              ]);
+            }}
+            className="border-slate-800 rounded-full"
+          >
+            View all workouts
+          </Button>
+          <Button
+            type="button"
+            variant={"outline"}
+            className="border-slate-800 rounded-full"
+          >
+            Show Current Workout Info
+          </Button>
+        </div>
 
-          // Submit and get response message
-          const responseMessage = await submitUserMessage(inputValue);
-          setMessages((currentMessages) => [
-            ...currentMessages,
-            responseMessage,
-          ]);
+        <form
+          className=" bg-black py-2 px-6 rounded-full flex flex-row gap-4 "
+          onSubmit={async (e) => {
+            e.preventDefault();
 
-          setInputValue("");
-        }}
-      >
-        <Input
-          placeholder="Send a message..."
-          value={inputValue}
-          className="border-0 text-white"
-          onChange={(event) => {
-            setInputValue(event.target.value);
+            // Add user message to UI state
+            setMessages((currentMessages) => [
+              ...currentMessages,
+              {
+                id: Date.now(),
+                display: <UserMessage message={inputValue} />,
+              },
+            ]);
+
+            // Submit and get response message
+            const responseMessage = await submitUserMessage(inputValue);
+            setMessages((currentMessages) => [
+              ...currentMessages,
+              responseMessage,
+            ]);
+
+            setInputValue("");
           }}
-        />
-        <Button
-          type="submit"
-          className="bg-white text-slate-800 hover:bg-slate-200"
         >
-          Send
-        </Button>
-      </form>
+          <Input
+            placeholder="Send a message..."
+            value={inputValue}
+            className="border-0 text-white"
+            onChange={(event) => {
+              setInputValue(event.target.value);
+            }}
+          />
+          <Button
+            type="submit"
+            className="bg-white text-slate-800 hover:bg-slate-200"
+          >
+            Send
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

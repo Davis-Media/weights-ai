@@ -1,3 +1,8 @@
+# IMPORTANT NOTE
+
+**The <Suspense /> stuff does not work correctly with createStreamableUI (at least as far as I can see so far), check out actions.tsx for examples that do work, data fetching in the action not component!
+**
+
 ## Weights AI
 
 *This project is built to showcase what kind of incredible stuff we can build with AI **ENHANCED** applications.*

@@ -1,6 +1,11 @@
 import "server-only";
 import { OpenAI } from "openai";
-import { createAI, getMutableAIState, render } from "ai/rsc";
+import {
+  createAI,
+  createStreamableUI,
+  getMutableAIState,
+  render,
+} from "ai/rsc";
 import z from "zod";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import { SystemMessage } from "@/components/Messages";
@@ -13,6 +18,8 @@ import {
   getWorkoutInfo,
 } from "@/lib/db/helper";
 import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
+import { Suspense } from "react";
+import { TestRSC } from "@/components/TestRSC";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -58,6 +65,30 @@ async function submitUserMessage(userInput: string) {
       return <SystemMessage message={content} needsSep={true} />;
     },
     tools: {
+      rsc_demo: {
+        description:
+          "Call this function when the user types 'demo' this is for debugging",
+        parameters: z.object({}),
+        render: async function* () {
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "rsc_demo",
+              content: "the user called rsc_demo, this is a debugging function",
+            },
+          ]);
+
+          return (
+            <div>
+              <h2>this does not work</h2>
+              <Suspense fallback={<div>CSE</div>}>
+                <TestRSC />
+              </Suspense>
+            </div>
+          );
+        },
+      },
       view_current_workout: {
         description:
           "Allows the user to view their current workout and its information",

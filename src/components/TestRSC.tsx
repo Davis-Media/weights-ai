@@ -1,5 +1,5 @@
 export const TestRSC: React.FC = async () => {
-  await delay(4000);
+  await delay(1000);
   return <div>RSC FROM SERVER</div>;
 };
 

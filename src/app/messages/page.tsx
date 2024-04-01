@@ -91,6 +91,25 @@ export default function Page() {
             type="button"
             variant={"outline"}
             className="border-slate-800 rounded-full"
+            onClick={async (e) => {
+              e.preventDefault();
+              const message = "Show me my current workout's information";
+              // Add user message to UI state
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                {
+                  id: Date.now(),
+                  display: <UserMessage message={message} />,
+                },
+              ]);
+
+              // Submit and get response message
+              const responseMessage = await submitUserMessage(message);
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                responseMessage,
+              ]);
+            }}
           >
             Show Current Workout Info
           </Button>

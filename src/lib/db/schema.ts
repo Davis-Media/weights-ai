@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const workout = sqliteTable("workout", {
@@ -10,6 +11,10 @@ export const workout = sqliteTable("workout", {
   userId: text("user_id").notNull(),
 });
 
+export const workoutRelations = relations(workout, ({ many }) => ({
+  sets: many(set),
+}));
+
 export const set = sqliteTable("set", {
   id: text("id").primaryKey(),
   lift: text("lift").notNull(),
@@ -19,3 +24,10 @@ export const set = sqliteTable("set", {
     .references(() => workout.id)
     .notNull(),
 });
+
+export const setRelations = relations(set, ({ one }) => ({
+  workout: one(workout, {
+    fields: [set.workoutId],
+    references: [workout.id],
+  }),
+}));

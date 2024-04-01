@@ -119,6 +119,17 @@ export const getAllWorkouts = async () => {
   return workouts;
 };
 
+export const getWorkoutInfo = async (workoutId: string) => {
+  const curWorkout = await db.query.workout.findFirst({
+    where: eq(workout.id, workoutId),
+    with: {
+      sets: true,
+    },
+  });
+
+  return curWorkout;
+};
+
 export const getAllExercises = async (workoutId: string) => {
   const { userId } = auth();
 

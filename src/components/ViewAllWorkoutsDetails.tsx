@@ -2,6 +2,10 @@
 
 import { setWorkoutInProgress } from "@/lib/db/helper";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+import { useUIState } from "ai/rsc";
+import { AI } from "@/app/action";
+import { SystemMessage } from "./Messages";
 
 export function ViewWorkoutDetails(props: {
   workout: {
@@ -14,6 +18,9 @@ export function ViewWorkoutDetails(props: {
   };
 }) {
   const { workout } = props;
+  const [_, setMessages] = useUIState<typeof AI>();
+
+  const router = useRouter();
 
   return (
     <div className="flex flex-row items-center p-4 gap-4" key={workout.id}>
@@ -34,7 +41,24 @@ export function ViewWorkoutDetails(props: {
             workout.inProgress ? "bg-yellow-500" : "bg-green-500"
           }`}
         />
-        <Button size="sm" onClick={() => setWorkoutInProgress(workout.id)}>
+        <Button
+          size="sm"
+          onClick={async () => {
+            await setWorkoutInProgress(workout.id);
+            setMessages([
+              {
+                id: new Date().getMilliseconds(),
+                display: (
+                  <SystemMessage
+                    needsSep={true}
+                    message="Selected new workout!"
+                  />
+                ),
+              },
+            ]);
+            router.refresh();
+          }}
+        >
           Activate
         </Button>
       </div>

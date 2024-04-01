@@ -14,6 +14,8 @@ import { Suspense } from "react";
 import { TestRSC } from "@/components/TestRSC";
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 import { UploadProgressPic } from "@/components/UploadProgressPic";
+import { getInProgressWorkout } from "@/lib/db/helper";
+import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -59,6 +61,49 @@ async function submitUserMessage(userInput: string) {
       return <SystemMessage message={content} needsSep={true} />;
     },
     tools: {
+      view_current_workout: {
+        description:
+          "Allows the user to view their current workout and its information",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>fetching...</div>;
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "view_current_workout",
+              content:
+                "user has been given a card to view the status of their current workout",
+            },
+          ]);
+
+          const curWorkout = await getInProgressWorkout();
+
+          if (!curWorkout) {
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="No currently active workout..."
+              />
+            );
+          }
+
+          const content = createStreamableUI(
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Here is your current workout:"
+              />
+              <Suspense fallback={<div>Loading...</div>}>
+                <WorkoutBreakdown workoutId={curWorkout.id} />
+              </Suspense>
+            </div>
+          );
+
+          return content.value;
+        },
+      },
       add_progress_picture: {
         description:
           "Allow the user to upload a progress picture of themselves for their workout",
@@ -212,17 +257,27 @@ async function submitUserMessage(userInput: string) {
   };
 }
 
-const initialAIState: {
+export const initialAIState: {
   role: "user" | "assistant" | "system" | "function";
   content: string;
   id?: string;
   name?: string;
 }[] = [];
 
-const initialUIState: {
+export const initialUIState: {
   id: number;
   display: React.ReactNode;
-}[] = [];
+}[] = [
+  {
+    id: Date.now(),
+    display: (
+      <SystemMessage
+        message="Hi! I am a personal workout logging system. The way this works is you can create workouts, activate them, then add your sets! Let me know how I can be of help."
+        needsSep={true}
+      />
+    ),
+  },
+];
 
 export const AI = createAI({
   actions: {

@@ -3,7 +3,9 @@ import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import ExerciseCard from "@/components/ExerciseCard";
 import { UploadProgressPic } from "@/components/UploadProgressPic";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
+import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
 import { SignIn, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Suspense } from "react";
 
 export default async function Home() {
   // testing loading some data
@@ -17,6 +19,9 @@ export default async function Home() {
         <CreateWorkoutCard />
         <ViewAllWorkouts />
         <UploadProgressPic />
+        <Suspense fallback={<div>loading mans</div>}>
+          <WorkoutBreakdown workoutId="im11ap2qe2" />
+        </Suspense>
       </SignedIn>
 
       <ExerciseCard />

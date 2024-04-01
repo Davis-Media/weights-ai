@@ -79,14 +79,18 @@ async function submitUserMessage(userInput: string) {
             },
           ]);
 
-          return (
+          const streamUI = createStreamableUI(<div>test start</div>);
+
+          streamUI.update(
             <div>
-              <h2>this does not work</h2>
-              <Suspense fallback={<div>CSE</div>}>
-                <TestRSC />
+              <h2>this does work?</h2>
+              <Suspense fallback={<div>LOADING TEST RSC?!?!?!?</div>}>
+                <TestRSC done={streamUI.done} />
               </Suspense>
             </div>
           );
+
+          return streamUI.value;
         },
       },
       view_current_workout: {

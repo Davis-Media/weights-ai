@@ -5,7 +5,7 @@ export async function CurrentWorkout() {
   const curWorkout = await getInProgressWorkout();
 
   return (
-    <Card className="fixed top-12 right-12 bg-black text-slate-100 py-2 px-6 rounded-full">
+    <Card className="md:fixed top-12 right-12 bg-black text-slate-100 py-2 px-6 rounded-full mx-auto">
       {curWorkout ? (
         // in progress workout real
         <div className="flex flex-row gap-4 items-center">

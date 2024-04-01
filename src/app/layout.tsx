@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <ClerkProvider>
         <AI>
-          <body className={inter.className}>
+          <body className={`${inter.className}`}>
             {/* scuffed as all hell, but whatever */}
             <CurrentWorkout />
             {children}

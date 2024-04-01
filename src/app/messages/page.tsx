@@ -19,9 +19,7 @@ export default function Page() {
 
   return (
     <div className="w-full h-screen flex flex-col relative">
-      <div className="w-[800px] mx-auto flex flex-col items-start ">
-        {/* <UserMessage message="Hi! What are you able to do?" />
-        <SystemMessage message="I am a personal weights tracker which can help you record what you have been working on and get your weights up." /> */}
+      <div className="md:w-[800px] mx-auto flex flex-col items-start px-4">
         {
           // View messages in UI state
           messages.map((message) => (
@@ -33,7 +31,7 @@ export default function Page() {
         <div className="bg-white w-full h-[300px]"></div>
       </div>
 
-      <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3">
+      <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full px-4">
         <div className="flex flex-row gap-2 overflow-x-scroll no-scrollbar">
           <Button
             type="button"

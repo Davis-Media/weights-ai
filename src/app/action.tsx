@@ -140,7 +140,7 @@ async function submitUserMessage(userInput: string) {
             initState: z.array(
               z.object({
                 exercise: z
-                  .enum(["bench", "deadlift"])
+                  .enum(["bench", "deadlift", "squat"])
                   .describe("The exercise the user did"),
                 reps: z
                   .number()

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { CircleMinus, CirclePlus, Copy } from "lucide-react";
 import { useState } from "react";
 import { saveNewSets } from "@/lib/db/helper";
+import { Separator } from "./ui/separator";
 
 export default function AddExerciseCardClient(props: {
   initState: {
@@ -54,9 +55,9 @@ export default function AddExerciseCardClient(props: {
         <CardTitle>Exercise(s)</CardTitle>
         <CardDescription>Enter your exercise details.</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-8">
         {createState.map((item, i) => (
-          <div className="grid grid-cols-12 gap-2" key={i}>
+          <div className="grid md:grid-cols-12 gap-2 grid-cols-8" key={i}>
             <div className="flex flex-col space-y-1.5 col-span-4" key={i}>
               <Label htmlFor="exercise">Exercise</Label>
               <Select
@@ -75,8 +76,6 @@ export default function AddExerciseCardClient(props: {
                   <SelectItem value="bench">Bench Press</SelectItem>
                   <SelectItem value="squat">Squat</SelectItem>
                   <SelectItem value="deadlift">Deadlift</SelectItem>
-                  <SelectItem value="curls">Bicep Curls</SelectItem>
-                  <SelectItem value="lunges">Lunges</SelectItem>
                 </SelectContent>
               </Select>
             </div>

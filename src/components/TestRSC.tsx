@@ -1,6 +1,6 @@
 export const TestRSC = async (props: { done: () => void }) => {
   await delay(3000);
-  props.done();
+  // props.done();
   return <div>RSC FROM SERVER</div>;
 };
 

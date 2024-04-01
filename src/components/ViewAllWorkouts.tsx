@@ -8,8 +8,19 @@ import {
 import { getAllWorkouts } from "@/lib/db/helper";
 import { ViewWorkoutDetails } from "./ViewAllWorkoutsDetails";
 
-export default async function ViewAllWorkouts() {
-  const workouts = await getAllWorkouts();
+type ViewAllWorkoutsProps = {
+  workouts: {
+    name: string;
+    date: Date;
+    id: string;
+    location: string;
+    inProgress: boolean;
+    userId: string;
+  }[];
+};
+
+export default async function ViewAllWorkouts(props: ViewAllWorkoutsProps) {
+  const { workouts } = props;
 
   return (
     <Card className="w-full max-w-lg">

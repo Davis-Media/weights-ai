@@ -11,11 +11,26 @@ import {
 } from "./ui/table";
 import { Button } from "./ui/button";
 
-export async function WorkoutBreakdown(props: { workoutId: string }) {
-  const { workoutId } = props;
-  const workoutInfo = await getWorkoutInfo(workoutId);
+type WorkoutBreakdownProps = {
+  workoutInfo: {
+    date: Date;
+    id: string;
+    location: string;
+    name: string;
+    inProgress: boolean;
+    userId: string;
+    sets: {
+      id: string;
+      lift: string;
+      weight: number;
+      reps: number;
+      workoutId: string;
+    }[];
+  };
+};
 
-  if (!workoutInfo) return <div>Workout not found...</div>;
+export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
+  const { workoutInfo } = props;
 
   return (
     <Card>

@@ -1,20 +1,17 @@
 import "server-only";
 import { OpenAI } from "openai";
-import {
-  createAI,
-  createStreamableUI,
-  getMutableAIState,
-  render,
-} from "ai/rsc";
+import { createAI, getMutableAIState, render } from "ai/rsc";
 import z from "zod";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import { SystemMessage } from "@/components/Messages";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
-import { Suspense } from "react";
-import { TestRSC } from "@/components/TestRSC";
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 import { UploadProgressPic } from "@/components/UploadProgressPic";
-import { getInProgressWorkout } from "@/lib/db/helper";
+import {
+  getAllWorkouts,
+  getInProgressWorkout,
+  getWorkoutInfo,
+} from "@/lib/db/helper";
 import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
 
 const openai = new OpenAI({
@@ -89,19 +86,25 @@ async function submitUserMessage(userInput: string) {
             );
           }
 
-          const content = createStreamableUI(
+          const workoutInfo = await getWorkoutInfo(curWorkout.id);
+          if (!workoutInfo) {
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="No currently active workout..."
+              />
+            );
+          }
+
+          return (
             <div>
               <SystemMessage
                 needsSep={false}
                 message="Here is your current workout:"
               />
-              <Suspense fallback={<div>Loading...</div>}>
-                <WorkoutBreakdown workoutId={curWorkout.id} />
-              </Suspense>
+              <WorkoutBreakdown workoutInfo={workoutInfo} />
             </div>
           );
-
-          return content.value;
         },
       },
       add_progress_picture: {
@@ -170,19 +173,15 @@ async function submitUserMessage(userInput: string) {
           ]);
 
           // need to make this stream-able so that suspense works
-          const content = createStreamableUI(
+          return (
             <div>
               <SystemMessage
                 needsSep={false}
                 message="Add your set here, once you are done go ahead and hit save!"
               />
-              <Suspense fallback={<div>Loading...</div>}>
-                <AddExerciseCardServer initState={test.initState} />
-              </Suspense>
+              <AddExerciseCardServer initState={test.initState} />
             </div>
           );
-
-          return content.value;
         },
       },
       view_all_workouts: {
@@ -201,25 +200,17 @@ async function submitUserMessage(userInput: string) {
             },
           ]);
 
-          // need to make this stream-able so that suspense works
-          const content = createStreamableUI(
+          const workouts = await getAllWorkouts();
+
+          return (
             <div>
               <SystemMessage
                 needsSep={false}
                 message="Here are all of your workouts!"
               />
-              <div className="bg-blue-200 my-2">
-                <Suspense fallback={<div>LOADING TEST RSC</div>}>
-                  <TestRSC />
-                </Suspense>
-              </div>
-              <Suspense fallback={<div>Loading...</div>}>
-                <ViewAllWorkouts />
-              </Suspense>
+              <ViewAllWorkouts workouts={workouts} />
             </div>
           );
-
-          return content.value;
         },
       },
       create_new_workout: {

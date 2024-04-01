@@ -17,11 +17,7 @@ export default async function Home() {
       <SignedIn>
         <UserButton />
         <CreateWorkoutCard />
-        <ViewAllWorkouts />
         <UploadProgressPic />
-        <Suspense fallback={<div>loading mans</div>}>
-          <WorkoutBreakdown workoutId="im11ap2qe2" />
-        </Suspense>
       </SignedIn>
 
       <ExerciseCard />

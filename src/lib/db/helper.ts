@@ -6,6 +6,18 @@ import { set, workout } from "./schema";
 import { generateId } from "../utils";
 import { and, eq } from "drizzle-orm";
 
+export const deleteSet = async (setId: string) => {
+  const { userId } = auth();
+
+  if (!userId) {
+    return null;
+  }
+
+  await db.delete(set).where(eq(set.id, setId));
+
+  return "success";
+};
+
 export const saveNewSets = async (
   input: {
     exercise: string;

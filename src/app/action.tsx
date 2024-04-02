@@ -85,7 +85,7 @@ async function submitUserMessage(userInput: string) {
             <div>
               <h2>this does work?</h2>
               <Suspense fallback={<div>LOADING TEST RSC?!?!?!?</div>}>
-                <TestRSC done={streamUI.done} />
+                <TestRSC />
               </Suspense>
             </div>
           );

@@ -1,4 +1,5 @@
-import { getWorkoutInfo } from "@/lib/db/helper";
+"use client";
+
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
 import {
@@ -10,6 +11,8 @@ import {
   TableRow,
 } from "./ui/table";
 import { Button } from "./ui/button";
+import { deleteSet } from "@/lib/db/helper";
+import { useState } from "react";
 
 type WorkoutBreakdownProps = {
   workoutInfo: {
@@ -32,6 +35,8 @@ type WorkoutBreakdownProps = {
 export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
   const { workoutInfo } = props;
 
+  const [sets, setSets] = useState(workoutInfo.sets);
+
   return (
     <Card>
       <CardContent>
@@ -51,14 +56,27 @@ export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {workoutInfo.sets.map((set) => {
+            {/* goofy but whatever */}
+            {sets.map((set, i) => {
               return (
                 <TableRow key={set.id}>
                   <TableCell className="font-semibold">{set.lift}</TableCell>
                   <TableCell>{set.weight}</TableCell>
                   <TableCell>{set.reps}</TableCell>
                   <TableCell>
-                    <Button>Remove</Button>
+                    <Button
+                      onClick={async () => {
+                        // TODO: flashing?
+                        await deleteSet(set.id);
+                        const copy = sets;
+
+                        copy.splice(i, 1);
+
+                        setSets([...copy]);
+                      }}
+                    >
+                      Remove
+                    </Button>
                   </TableCell>
                 </TableRow>
               );

@@ -193,7 +193,7 @@ async function submitUserMessage(userInput: string) {
         render: async function* (props) {
           yield <div>fetching...</div>;
 
-          const test = JSON.parse(props as unknown as string);
+          const test = props;
 
           console.log(test);
 

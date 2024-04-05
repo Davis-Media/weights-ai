@@ -1,6 +1,7 @@
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
 import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import ExerciseCard from "@/components/ExerciseCard";
+import { TestRSC } from "@/components/TestRSC";
 import { UploadProgressPic } from "@/components/UploadProgressPic";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
 import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
@@ -19,6 +20,10 @@ export default async function Home() {
         <CreateWorkoutCard />
         <UploadProgressPic />
       </SignedIn>
+
+      <Suspense fallback={<div>LOADING THE RSC</div>}>
+        <TestRSC />
+      </Suspense>
 
       <ExerciseCard />
       <AddExerciseCardServer initState={[]} />

@@ -137,7 +137,11 @@ export default function AddExerciseCardClient(props: {
                 onClick={(e) => {
                   e.preventDefault();
 
+                  // fetch backend to save
+
                   setCreateState([...createState, item]);
+
+                  // catch any errors, if it fails, roll back state update
                 }}
               >
                 <Copy className="w-4 h-4" />

@@ -4,11 +4,16 @@ import { db } from ".";
 import { set, workout } from "./schema";
 import { generateId } from "../utils";
 import { and, eq } from "drizzle-orm";
+import { createClient } from "../supabase/server";
 
 export const deleteSet = async (setId: string) => {
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return null;
   }
 
@@ -48,23 +53,31 @@ export const saveNewSets = async (
 };
 
 export const getInProgressWorkout = async () => {
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return undefined;
   }
 
   const curWorkout = await db.query.workout.findFirst({
-    where: and(eq(workout.userId, userId), eq(workout.inProgress, true)),
+    where: and(eq(workout.userId, user.id), eq(workout.inProgress, true)),
   });
 
   return curWorkout;
 };
 
 export const setWorkoutInProgress = async (workoutId: string) => {
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return {
       error: "user is not logged in",
     };
@@ -75,7 +88,7 @@ export const setWorkoutInProgress = async (workoutId: string) => {
     .set({
       inProgress: false,
     })
-    .where(eq(workout.userId, userId));
+    .where(eq(workout.userId, user.id));
 
   // TODO validate that the user owns this workout
   await db
@@ -97,9 +110,13 @@ export const createWorkout = async (data: {
   inProgress: boolean;
 }) => {
   // ensure user is logged in
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return {
       nId: null,
       error: "user is not logged in",
@@ -108,7 +125,7 @@ export const createWorkout = async (data: {
 
   const id = generateId(100);
 
-  await db.insert(workout).values({ ...data, userId, id });
+  await db.insert(workout).values({ ...data, userId: user.id, id });
 
   return {
     nId: id,
@@ -117,14 +134,18 @@ export const createWorkout = async (data: {
 };
 
 export const getAllWorkouts = async () => {
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return [];
   }
 
   const workouts = await db.query.workout.findMany({
-    where: eq(workout.userId, userId),
+    where: eq(workout.userId, user.id),
   });
 
   return workouts;
@@ -142,9 +163,13 @@ export const getWorkoutInfo = async (workoutId: string) => {
 };
 
 export const getAllExercises = async (workoutId: string) => {
-  const userId = "temp";
+  const supabase = createClient();
 
-  if (!userId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return [];
   }
 

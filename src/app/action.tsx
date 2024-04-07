@@ -11,7 +11,6 @@ import CreateWorkoutCard from "@/components/CreateWorkoutCard";
 import { SystemMessage } from "@/components/Messages";
 import ViewAllWorkouts from "@/components/ViewAllWorkouts";
 import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
-import { UploadProgressPic } from "@/components/UploadProgressPic";
 import {
   getAllWorkouts,
   getInProgressWorkout,
@@ -165,7 +164,6 @@ async function submitUserMessage(userInput: string) {
                 needsSep={false}
                 message="Upload your progress photo here!"
               />
-              <UploadProgressPic />
             </div>
           );
         },

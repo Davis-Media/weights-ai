@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { CircleMinus, CirclePlus, Copy } from "lucide-react";
 import { useState } from "react";
 import { saveNewSets } from "@/lib/db/helper";
-import { Separator } from "./ui/separator";
 
 export default function AddExerciseCardClient(props: {
   initState: {

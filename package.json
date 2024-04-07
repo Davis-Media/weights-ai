@@ -12,7 +12,6 @@
     "db:dev": "turso dev --db-file local.db"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.29.9",
     "@libsql/client": "^0.5.6",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-icons": "^1.3.0",
@@ -21,6 +20,8 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@supabase/ssr": "^0.1.0",
+    "@supabase/supabase-js": "^2.42.0",
     "@uploadthing/react": "^6.4.1",
     "ai": "^3.0.2",
     "class-variance-authority": "^0.7.0",

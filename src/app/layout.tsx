@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import { AI } from "./action";
 import { CurrentWorkout } from "@/components/CurrentWorkout";
-import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,15 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ClerkProvider>
-        <AI>
-          <body className={`${inter.className}`}>
-            {/* scuffed as all hell, but whatever */}
-            <CurrentWorkout />
-            {children}
-          </body>
-        </AI>
-      </ClerkProvider>
+      <AI>
+        <body className={`${inter.className}`}>
+          {/* scuffed as all hell, but whatever */}
+          <CurrentWorkout />
+          {children}
+        </body>
+      </AI>
     </html>
   );
 }

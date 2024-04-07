@@ -1,4 +1,3 @@
-import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Separator } from "./ui/separator";
 
@@ -22,7 +21,7 @@ export function SystemMessage(props: { message: string; needsSep: boolean }) {
 }
 
 export function UserMessage(props: { message: string }) {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded } = {} as any;
   return (
     <div className="flex flex-col gap-2 py-3">
       <div className="flex gap-2">

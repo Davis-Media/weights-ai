@@ -1,13 +1,12 @@
 "use server";
 import "server-only";
-import { auth } from "@clerk/nextjs";
 import { db } from ".";
 import { set, workout } from "./schema";
 import { generateId } from "../utils";
 import { and, eq } from "drizzle-orm";
 
 export const deleteSet = async (setId: string) => {
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return null;
@@ -23,7 +22,7 @@ export const saveNewSets = async (
     exercise: string;
     reps: number;
     weight: number;
-  }[]
+  }[],
 ) => {
   const workout = await getInProgressWorkout();
 
@@ -49,7 +48,7 @@ export const saveNewSets = async (
 };
 
 export const getInProgressWorkout = async () => {
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return undefined;
@@ -63,7 +62,7 @@ export const getInProgressWorkout = async () => {
 };
 
 export const setWorkoutInProgress = async (workoutId: string) => {
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return {
@@ -98,7 +97,7 @@ export const createWorkout = async (data: {
   inProgress: boolean;
 }) => {
   // ensure user is logged in
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return {
@@ -118,7 +117,7 @@ export const createWorkout = async (data: {
 };
 
 export const getAllWorkouts = async () => {
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return [];
@@ -143,7 +142,7 @@ export const getWorkoutInfo = async (workoutId: string) => {
 };
 
 export const getAllExercises = async (workoutId: string) => {
-  const { userId } = auth();
+  const userId = "temp";
 
   if (!userId) {
     return [];

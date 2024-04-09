@@ -8,6 +8,13 @@
       "when": 1712517758665,
       "tag": "0000_fluffy_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1712674941022,
+      "tag": "0001_tricky_pride",
+      "breakpoints": true
     }
   ]
 }

@@ -22,18 +22,8 @@ export const userExerciseRelations = relations(userExercise, ({ many }) => {
 
 export const userSchedule = pgTable("user_schedule", {
   id: varchar("id", { length: 100 }).primaryKey(),
-  day: varchar("day", {
-    length: 20,
-    enum: [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
-  }).notNull(),
+  // NOTE: sunday = 0
+  day: integer("day").notNull(),
   userId: varchar("user_id").notNull(),
 });
 

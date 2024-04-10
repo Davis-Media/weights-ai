@@ -1,5 +1,5 @@
 {
-  "id": "2f9d5d52-5b98-4509-a4b1-f12cfefd357c",
+  "id": "00f363ce-7913-4e03-b438-8f723f4ff36c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -14,9 +14,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "lift": {
-          "name": "lift",
-          "type": "varchar(255)",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
         },
@@ -32,6 +32,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "user_exercise_id": {
+          "name": "user_exercise_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "workout_id": {
           "name": "workout_id",
           "type": "varchar(255)",
@@ -41,12 +47,142 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "set_user_exercise_id_user_exercise_id_fk": {
+          "name": "set_user_exercise_id_user_exercise_id_fk",
+          "tableFrom": "set",
+          "tableTo": "user_exercise",
+          "columnsFrom": [
+            "user_exercise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "set_workout_id_workout_id_fk": {
           "name": "set_workout_id_workout_id_fk",
           "tableFrom": "set",
           "tableTo": "workout",
           "columnsFrom": [
             "workout_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "user_exercise": {
+      "name": "user_exercise",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(100)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "user_schedule": {
+      "name": "user_schedule",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(100)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "user_schedule_entry": {
+      "name": "user_schedule_entry",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(100)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_exercise_id": {
+          "name": "user_exercise_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_schedule_id": {
+          "name": "user_schedule_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_schedule_entry_user_exercise_id_user_exercise_id_fk": {
+          "name": "user_schedule_entry_user_exercise_id_user_exercise_id_fk",
+          "tableFrom": "user_schedule_entry",
+          "tableTo": "user_exercise",
+          "columnsFrom": [
+            "user_exercise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_schedule_entry_user_schedule_id_user_schedule_id_fk": {
+          "name": "user_schedule_entry_user_schedule_id_user_schedule_id_fk",
+          "tableFrom": "user_schedule_entry",
+          "tableTo": "user_schedule",
+          "columnsFrom": [
+            "user_schedule_id"
           ],
           "columnsTo": [
             "id"
@@ -93,9 +229,15 @@
           "notNull": true,
           "default": false
         },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         }

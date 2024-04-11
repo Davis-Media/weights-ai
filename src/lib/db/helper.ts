@@ -1,7 +1,7 @@
 "use server";
 import "server-only";
 import { db } from ".";
-import { set, workout } from "./schema";
+import { set, userExercise, workout } from "./schema";
 import { generateId } from "../utils";
 import { and, eq } from "drizzle-orm";
 import { createClient } from "../supabase/server";

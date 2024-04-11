@@ -17,3 +17,13 @@ const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 10);
 export function generateId(length = 10): string {
   return nanoid();
 }
+
+export const debounce = (func: Function, delay: number) => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return (...args: any[]) => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AI } from "./action";
 import { CurrentWorkout } from "@/components/CurrentWorkout";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AI>
-        <body className={`${inter.className}`}>
-          {/* scuffed as all hell, but whatever */}
-          <CurrentWorkout />
-          {children}
-        </body>
+        <Providers>
+          <body className={`${inter.className}`}>
+            {/* scuffed as all hell, but whatever */}
+            <CurrentWorkout />
+            {children}
+          </body>
+        </Providers>
       </AI>
     </html>
   );

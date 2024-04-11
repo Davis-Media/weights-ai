@@ -50,7 +50,7 @@ export const userScheduleEntryRelations = relations(
       references: [userExercise.id],
     }),
     userSchedule: one(userSchedule, {
-      fields: [userScheduleEntry.userExerciseId],
+      fields: [userScheduleEntry.userScheduleId],
       references: [userSchedule.id],
     }),
   }),

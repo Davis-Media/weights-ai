@@ -19,7 +19,7 @@ type ViewAllWorkoutsProps = {
   }[];
 };
 
-export default async function ViewAllWorkouts(props: ViewAllWorkoutsProps) {
+export default function ViewAllWorkouts(props: ViewAllWorkoutsProps) {
   const { workouts } = props;
 
   return (

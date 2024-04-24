@@ -59,32 +59,7 @@ export default function Page() {
           >
             View all workouts
           </Button>
-          <Button
-            type="button"
-            variant={"outline"}
-            onClick={async (e) => {
-              e.preventDefault();
-              const message = "Let me upload a progress picture";
-              // Add user message to UI state
-              setMessages((currentMessages) => [
-                ...currentMessages,
-                {
-                  id: Date.now(),
-                  display: <UserMessage message={message} />,
-                },
-              ]);
 
-              // Submit and get response message
-              const responseMessage = await submitUserMessage(message);
-              setMessages((currentMessages) => [
-                ...currentMessages,
-                responseMessage,
-              ]);
-            }}
-            className="border-slate-800 rounded-full"
-          >
-            Upload Progress Pic
-          </Button>
           <Button
             type="button"
             variant={"outline"}
@@ -110,6 +85,32 @@ export default function Page() {
             }}
           >
             Show Current Workout Info
+          </Button>
+          <Button
+            type="button"
+            variant={"outline"}
+            className="border-slate-800 rounded-full"
+            onClick={async (e) => {
+              e.preventDefault();
+              const message = "Let me manage my schedule";
+              // Add user message to UI state
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                {
+                  id: Date.now(),
+                  display: <UserMessage message={message} />,
+                },
+              ]);
+
+              // Submit and get response message
+              const responseMessage = await submitUserMessage(message);
+              setMessages((currentMessages) => [
+                ...currentMessages,
+                responseMessage,
+              ]);
+            }}
+          >
+            Manage Schedule
           </Button>
         </div>
 

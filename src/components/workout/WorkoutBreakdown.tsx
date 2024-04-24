@@ -25,6 +25,9 @@ type WorkoutBreakdownProps = {
     endedAt: Date | null;
     sets: {
       id: string;
+      userExercise: {
+        name: string;
+      };
       createdAt: Date;
       userExerciseId: string;
       weight: number;
@@ -34,7 +37,7 @@ type WorkoutBreakdownProps = {
   };
 };
 
-export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
+export function WorkoutBreakdown(props: WorkoutBreakdownProps) {
   const { workoutInfo } = props;
 
   const [sets, setSets] = useState(workoutInfo.sets);
@@ -72,7 +75,7 @@ export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
               return (
                 <TableRow key={set.id}>
                   <TableCell className="font-semibold">
-                    {set.userExerciseId}
+                    {set.userExercise.name}
                   </TableCell>
                   <TableCell>{set.weight}</TableCell>
                   <TableCell>{set.reps}</TableCell>

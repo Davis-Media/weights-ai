@@ -17,36 +17,41 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CircleMinus, CirclePlus, Copy } from "lucide-react";
+import { CircleMinus, Copy } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUserExercises } from "@/lib/helper/exercise";
 import { saveNewSets } from "@/lib/helper/sets";
 
 export default function AddExerciseCardClient(props: {
   initState: {
-    exercise: string;
+    exerciseId: string;
     reps: number;
     weight: number;
   }[];
 }) {
   const { initState } = props;
+
+  const allUserExercisesQuery = useQuery({
+    queryKey: ["allUserExercises"],
+    queryFn: async () => {
+      const allUserExercises = await getAllUserExercises();
+      return allUserExercises;
+    },
+  });
+
   const [createState, setCreateState] = useState<
     {
-      exercise: string;
+      exerciseId: string;
       reps: number;
       weight: number;
     }[]
-  >(
-    initState.length > 0
-      ? initState
-      : [
-          {
-            exercise: "deadlift",
-            weight: 0,
-            reps: 0,
-          },
-        ]
-  );
+  >(initState);
   const [hasSaved, setHasSaved] = useState(false);
+
+  if (!allUserExercisesQuery.data) {
+    return <div>LOADING...</div>;
+  }
 
   return (
     <Card>
@@ -60,11 +65,11 @@ export default function AddExerciseCardClient(props: {
             <div className="flex flex-col space-y-1.5 col-span-4" key={i}>
               <Label htmlFor="exercise">Exercise</Label>
               <Select
-                value={item.exercise}
+                value={item.exerciseId}
                 disabled={hasSaved}
                 onValueChange={(v) => {
                   const copy = createState;
-                  copy[i].exercise = v;
+                  copy[i].exerciseId = v;
                   setCreateState([...copy]);
                 }}
               >
@@ -72,9 +77,11 @@ export default function AddExerciseCardClient(props: {
                   <SelectValue placeholder="Select an exercise" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bench">Bench Press</SelectItem>
-                  <SelectItem value="squat">Squat</SelectItem>
-                  <SelectItem value="deadlift">Deadlift</SelectItem>
+                  {allUserExercisesQuery.data.map((exercise) => (
+                    <SelectItem value={exercise.id} key={exercise.id}>
+                      {exercise.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -145,25 +152,6 @@ export default function AddExerciseCardClient(props: {
               >
                 <Copy className="w-4 h-4" />
               </Button>
-              <Button
-                className="text-white bg-green-600 p-2 rounded-lg w-10 h-10"
-                type="button"
-                disabled={hasSaved}
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  setCreateState([
-                    ...createState,
-                    {
-                      exercise: "bench",
-                      weight: 225,
-                      reps: 5,
-                    },
-                  ]);
-                }}
-              >
-                <CirclePlus className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         ))}
@@ -177,7 +165,7 @@ export default function AddExerciseCardClient(props: {
             e.preventDefault();
 
             if (!hasSaved) {
-              // await saveNewSets(createState);
+              await saveNewSets(createState);
 
               setHasSaved(true);
             }

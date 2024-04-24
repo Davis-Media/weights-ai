@@ -23,6 +23,10 @@ import {
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
 import { getUserScheduleOneDay } from "@/lib/helper/schedule";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { userExercise } from "@/lib/db/schema";
+import { getOrCreateProfile } from "@/lib/helper/auth";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -30,6 +34,27 @@ const openai = new OpenAI({
 
 async function submitUserMessage(userInput: string) {
   "use server";
+
+  // ensure that the user is logged in
+  const { profile, error } = await getOrCreateProfile();
+  if (error || !profile) {
+    return {
+      id: Date.now(),
+      display: <SystemMessage message={error} needsSep={true} />,
+    };
+  }
+
+  if (profile.role === "user") {
+    return {
+      id: Date.now(),
+      display: (
+        <SystemMessage
+          message="You are not allowed to do this! COMING SOON"
+          needsSep={true}
+        />
+      ),
+    };
+  }
 
   const aiState = getMutableAIState<typeof AI>();
 
@@ -42,7 +67,7 @@ async function submitUserMessage(userInput: string) {
   ]);
 
   const ui = render({
-    model: "gpt-4-0125-preview",
+    model: "gpt-3.5-turbo",
     provider: openai,
     messages: [
       {
@@ -147,30 +172,79 @@ async function submitUserMessage(userInput: string) {
       },
       add_sets: {
         description:
-          "Allow the user to input their sets and add exercises to their currently active workout. You can pass in some init state if they give you info in their prompt.",
+          "Allow the user to input their set. Fill in the exercise, reps, and weight. If they fail to provide any of these, you can ask them to try again.",
         parameters: z
           .object({
-            initState: z.array(
-              z.object({
-                exercise: z
-                  .enum(["bench", "deadlift", "squat"])
-                  .describe("The exercise the user did"),
-                reps: z
-                  .number()
-                  .describe("The number of reps they did of that exercise"),
-                weight: z
-                  .number()
-                  .describe("The amount of weight that the user did"),
-              })
-            ),
+            exercise: z.string().describe("The exercise the user did"),
+            reps: z
+              .number()
+              .describe("The number of reps they did of that exercise"),
+            weight: z
+              .number()
+              .describe("The amount of weight that the user did"),
           })
           .required(),
         render: async function* (props) {
           yield <div>fetching...</div>;
 
-          const test = props;
+          // need to match the user input to one of their current exercises
+          const allUserExercises = await db.query.userExercise.findMany({
+            where: eq(userExercise.profileId, profile.id),
+          });
 
-          console.log(test);
+          const testArray = allUserExercises.map((exercise) => exercise.name);
+
+          const sendData: {
+            exerciseId: string;
+            reps: number;
+            weight: number;
+          }[] = [];
+
+          let errorMsg: string | null = null;
+          // Ask OpenAI for a streaming chat completion given the prompt
+          const response = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            stream: false,
+            messages: [
+              {
+                content: `I need you to figure out which entry of this array best matches the string. Please just return a number (the index) and NOTHING else. THE ARRAY: ${testArray.toString()} THE QUERY: ${
+                  props.exercise
+                }`,
+                role: "user",
+              },
+            ],
+          });
+
+          // try and parse the response
+          const selectedIndex = parseInt(
+            response.choices[0].message.content ?? "NOT FOUND"
+          );
+
+          if (isNaN(selectedIndex)) {
+            errorMsg =
+              "I couldn't find a match for that exercise, please try again! You can choose from the following exercises: " +
+              testArray.toString();
+            +" To add more do so in your schedule!";
+          } else {
+            sendData.push({
+              exerciseId: allUserExercises[selectedIndex].id,
+              reps: props.reps,
+              weight: props.weight,
+            });
+          }
+
+          if (errorMsg) {
+            aiState.done([
+              ...aiState.get(),
+              {
+                role: "function",
+                name: "add_sets",
+                content:
+                  "the user did not provide a valid exercise, please try again!",
+              },
+            ]);
+            return <SystemMessage needsSep={true} message={errorMsg} />;
+          }
 
           aiState.done([
             ...aiState.get(),
@@ -189,7 +263,7 @@ async function submitUserMessage(userInput: string) {
                 needsSep={false}
                 message="Add your set here, once you are done go ahead and hit save!"
               />
-              <AddExerciseCardServer initState={test.initState} />
+              <AddExerciseCardServer initState={sendData} />
             </div>
           );
         },

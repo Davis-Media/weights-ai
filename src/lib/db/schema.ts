@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -9,12 +10,15 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+export const roleEnum = pgEnum("role", ["user", "pro", "admin"]);
+
 export const profile = pgTable("profile", {
   // MATCHES USER ID FROM SUPABASE AUTH
   id: uuid("id").primaryKey(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull(),
+  role: roleEnum("role").notNull().default("user"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull()
     .$defaultFn(() => new Date()),
 });

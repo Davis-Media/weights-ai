@@ -124,7 +124,11 @@ export const getWorkoutInfo = async (workoutId: string) => {
   const curWorkout = await db.query.workout.findFirst({
     where: eq(workout.id, workoutId),
     with: {
-      sets: true,
+      sets: {
+        with: {
+          userExercise: true,
+        },
+      },
     },
   });
 

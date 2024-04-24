@@ -5,6 +5,20 @@ import { and, eq, like } from "drizzle-orm";
 import { getOrCreateProfile } from "./auth";
 import { set, userExercise } from "../db/schema";
 
+export const getAllUserExercises = async () => {
+  const { profile, error } = await getOrCreateProfile();
+
+  if (error || !profile) {
+    return [];
+  }
+
+  const userExercises = await db.query.userExercise.findMany({
+    where: eq(userExercise.profileId, profile.id),
+  });
+
+  return userExercises;
+};
+
 export const getAllExercises = async (workoutId: string) => {
   const { profile, error } = await getOrCreateProfile();
 

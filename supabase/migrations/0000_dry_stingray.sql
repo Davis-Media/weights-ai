@@ -1,8 +1,15 @@
+DO $$ BEGIN
+ CREATE TYPE "role" AS ENUM('user', 'pro', 'admin');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "profile" (
 	"id" uuid PRIMARY KEY NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
 	"email" text NOT NULL,
+	"role" "role" DEFAULT 'user' NOT NULL,
 	"created_at" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
@@ -43,12 +50,13 @@ CREATE TABLE IF NOT EXISTS "workout" (
 	"ended_at" timestamp with time zone,
 	"profile_id" uuid NOT NULL
 );
+
 alter table "profile" enable row level security;
+alter table "set" enable row level security;
 alter table "user_exercise" enable row level security;
 alter table "user_schedule" enable row level security;
 alter table "user_schedule_entry" enable row level security;
 alter table "workout" enable row level security;
-alter table "set" enable row level security;
 
 --> statement-breakpoint
 DO $$ BEGIN

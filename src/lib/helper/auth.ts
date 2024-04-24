@@ -39,7 +39,9 @@ export const getOrCreateProfile = async () => {
     };
   }
 
-  const nameParts = user.user_metadata.full_name.split(" ") as string[];
+  const fullNameMetadata = user.user_metadata.full_name ?? "";
+
+  const nameParts = fullNameMetadata.split(" ") as string[];
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts[1] ?? "";
 

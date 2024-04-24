@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";

@@ -21,6 +21,8 @@ import {
   getWorkoutInfo,
 } from "@/lib/helper/workout";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
+import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
+import { getUserScheduleOneDay } from "@/lib/helper/schedule";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -294,6 +296,43 @@ async function submitUserMessage(userInput: string) {
           );
         },
       },
+      get_todays_schedule: {
+        description: "Allow the user to view their schedule for today",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>fetching...</div>;
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "get_todays_schedule",
+              content: "provided the UI for the user to view their schedule",
+            },
+          ]);
+
+          const schedule = await getUserScheduleOneDay(new Date().getDay());
+
+          if (!schedule.data) {
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="No schedule found for today..."
+              />
+            );
+          }
+
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Here is your schedule for today:"
+              />
+              <OneDaySchedule entry={schedule.data} />
+            </div>
+          );
+        },
+      },
       manage_schedule: {
         description:
           "Allow the user to manage their schedule, set which exercises they want to do on each day of the week",
@@ -314,7 +353,7 @@ async function submitUserMessage(userInput: string) {
             <div>
               <SystemMessage
                 needsSep={false}
-                message="Lets get your workout info ready, once you submit, your workout will automatically start!"
+                message="You can set which exercises you want to do on each day of the week, and how many sets you want to do for each exercise."
               />
               <ManageSchedule />
             </div>

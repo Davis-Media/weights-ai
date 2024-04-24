@@ -39,6 +39,15 @@ export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
 
   const [sets, setSets] = useState(workoutInfo.sets);
 
+  const submitDelete = async (id: string, idx: number) => {
+    await deleteSet(id);
+    const copy = sets;
+
+    copy.splice(idx, 1);
+
+    setSets([...copy]);
+  };
+
   return (
     <Card>
       <CardContent>
@@ -68,19 +77,7 @@ export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
                   <TableCell>{set.weight}</TableCell>
                   <TableCell>{set.reps}</TableCell>
                   <TableCell>
-                    <Button
-                      onClick={async () => {
-                        // TODO: flashing?
-                        await deleteSet(set.id);
-                        const copy = sets;
-
-                        copy.splice(i, 1);
-
-                        setSets([...copy]);
-                      }}
-                    >
-                      Remove
-                    </Button>
+                    <Button onClick={() => submitDelete(set.id, i)}></Button>
                   </TableCell>
                 </TableRow>
               );

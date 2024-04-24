@@ -6,19 +6,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Pen, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Edit, Pen, X } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useMemo, useState } from "react";
-import { createUserSchedule, getUserSchedule } from "@/lib/helper/schedule";
+import {
+  createUserSchedule,
+  getUserSchedule,
+  getUserScheduleDay,
+  updateUserSchedule,
+} from "@/lib/helper/schedule";
 import { createUserExercise, searchForExercise } from "@/lib/helper/exercise";
 
 export function ManageSchedule() {
@@ -65,10 +68,7 @@ export function ManageSchedule() {
                     <h4 className="text-slate-600 text-sm italic">
                       {userSch.exercises} Exercises Set
                     </h4>
-                    <Button className="flex gap-2">
-                      <Pen className="w-4 h-4" />
-                      Edit
-                    </Button>
+                    <EditDay scheduleId={userSch.id} />
                   </div>
                 </div>
                 <Separator className="my-2" />
@@ -84,6 +84,288 @@ export function ManageSchedule() {
         />
       </CardContent>
     </Card>
+  );
+}
+
+function EditDay(props: { scheduleId: string }) {
+  const { scheduleId } = props;
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const dayQuery = useQuery({
+    queryKey: ["user_schedule_day", scheduleId],
+    queryFn: async () => {
+      const res = await getUserScheduleDay(scheduleId);
+
+      if (!res.data) {
+        throw new Error(res.message);
+      }
+
+      setSelectedExercises(
+        res.data.userScheduleEntries.map((se) => {
+          return {
+            name: se.userExercise.name,
+            id: se.userExercise.id,
+            order: se.order,
+          };
+        })
+      );
+
+      return res.data;
+    },
+    initialData: null,
+  });
+
+  const [selectedExercises, setSelectedExercises] = useState<
+    {
+      name: string;
+      id: string;
+      order: number;
+    }[]
+  >([]);
+
+  const createExerciseMutation = useMutation({
+    mutationKey: ["create_exercise"],
+    mutationFn: async (name: string) => {
+      const res = await createUserExercise(name);
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      setExerciseSearchQuery("");
+
+      let maxOrder = 0;
+      selectedExercises.forEach((selEx) => {
+        if (selEx.order > maxOrder) {
+          maxOrder = selEx.order;
+        }
+      });
+
+      setSelectedExercises([
+        ...selectedExercises,
+        {
+          id: res.data,
+          name,
+          order: maxOrder + 1,
+        },
+      ]);
+    },
+  });
+
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const searchForExerciseQuery = useQuery({
+    queryKey: ["search_for_exercise", exerciseSearchQuery],
+    queryFn: async () => {
+      const res = await searchForExercise(exerciseSearchQuery);
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      return res.data;
+    },
+    initialData: [],
+  });
+
+  const sortedSelectedExercises = useMemo(() => {
+    const copy = selectedExercises;
+
+    copy.sort((a, b) => a.order - b.order);
+
+    return copy;
+  }, [selectedExercises]);
+
+  const updateScheduleMutation = useMutation({
+    mutationKey: ["update_schedule"],
+    mutationFn: async () => {
+      const res = await updateUserSchedule({
+        scheduleId,
+        exercises: selectedExercises.map((selEx) => ({
+          exerciseId: selEx.id,
+          order: selEx.order,
+        })),
+      });
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      setIsOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ["user_schedule"] });
+    },
+  });
+
+  if (dayQuery.error) {
+    return (
+      <div className="flex justify-center items-center">
+        <h4 className="text-slate-600 text-sm italic">
+          {dayQuery.error.message}
+        </h4>
+      </div>
+    );
+  }
+
+  if (!dayQuery.data) {
+    return <Button disabled={true}>Loading...</Button>;
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(v) => setIsOpen(v)}>
+      <Button onClick={() => setIsOpen(true)}>Edit</Button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit this Day</DialogTitle>
+          <DialogDescription>
+            Change the exercises that you want to do on this day of the week
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col">
+            <h2>Current Exercises</h2>
+            {sortedSelectedExercises.map((ex, i) => {
+              return (
+                <div
+                  key={ex.id}
+                  className={`flex justify-between py-2 px-3 rounded-md items-center ${
+                    i % 2 === 0 && "bg-slate-300"
+                  }`}
+                >
+                  <h3 className="text-slate-900 font-bold">{ex.name}</h3>
+                  <div className="flex gap-1">
+                    <Button
+                      className="p-1"
+                      onClick={() => {
+                        const copy = selectedExercises;
+
+                        if (i === 0) {
+                          // flip first and last items
+                          const lastOrder = copy[copy.length - 1].order;
+                          copy[copy.length - 1].order = copy[0].order;
+                          copy[0].order = lastOrder;
+                        } else {
+                          const aboveOrder = copy[i - 1].order;
+                          copy[i - 1].order = copy[i].order;
+                          copy[i].order = aboveOrder;
+                        }
+
+                        setSelectedExercises([...copy]);
+                      }}
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      className="p-1"
+                      onClick={() => {
+                        const copy = selectedExercises;
+
+                        if (i === selectedExercises.length - 1) {
+                          // flip first and last items
+                          const lastOrder = copy[copy.length - 1].order;
+                          copy[copy.length - 1].order = copy[0].order;
+                          copy[0].order = lastOrder;
+                        } else {
+                          const belowOrder = copy[i + 1].order;
+                          copy[i + 1].order = copy[i].order;
+                          copy[i].order = belowOrder;
+                        }
+
+                        setSelectedExercises([...copy]);
+                      }}
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      className="p-1 bg-red-600"
+                      onClick={() => {
+                        const copy = selectedExercises;
+
+                        copy.splice(i, 1);
+
+                        setSelectedExercises([...copy]);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <Separator />
+
+          <div className="relative">
+            <h2>Create or Add an Exercise</h2>
+            <Input
+              placeholder="Bench"
+              onChange={(e) => {
+                setExerciseSearchQuery(e.target.value);
+              }}
+              value={exerciseSearchQuery}
+            ></Input>
+
+            {exerciseSearchQuery !== "" && (
+              <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
+                {searchForExerciseQuery.data
+                  .filter(
+                    (v) =>
+                      0 >
+                      selectedExercises.findIndex((findV) => v.id === findV.id)
+                  )
+                  .map((res) => {
+                    return (
+                      <Button
+                        key={res.id}
+                        variant={"ghost"}
+                        className="justify-start"
+                        onClick={() => {
+                          let maxOrder = 0;
+                          selectedExercises.forEach((selEx) => {
+                            if (selEx.order > maxOrder) {
+                              maxOrder = selEx.order;
+                            }
+                          });
+                          setExerciseSearchQuery("");
+                          setSelectedExercises([
+                            ...selectedExercises,
+                            {
+                              id: res.id,
+                              name: res.name,
+                              order: maxOrder + 1,
+                            },
+                          ]);
+                        }}
+                      >
+                        ADD: {res.name}
+                      </Button>
+                    );
+                  })}
+                <Button
+                  variant={"ghost"}
+                  className="justify-start"
+                  onClick={() =>
+                    createExerciseMutation.mutate(exerciseSearchQuery)
+                  }
+                >
+                  CREATE: {exerciseSearchQuery}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button onClick={() => updateScheduleMutation.mutate()}>Save</Button>
+          <Button variant={"secondary"} onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -184,7 +466,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={(v) => setIsOpen(v)}>
       <Button onClick={() => setIsOpen(true)}>Add Day</Button>
       <DialogContent>
         <DialogHeader>
@@ -389,7 +671,9 @@ function CreateNewDay(props: { takenDays: number[] }) {
         </div>
         <DialogFooter>
           <Button onClick={() => createScheduleMutation.mutate()}>Save</Button>
-          <Button variant={"secondary"}>Cancel</Button>
+          <Button variant={"secondary"} onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

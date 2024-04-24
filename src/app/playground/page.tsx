@@ -1,5 +1,5 @@
 import { AddExerciseCardServer } from "@/components/exercise/AddExerciseCardServer";
-import ExerciseCard from "@/components/exercise/ExerciseCard";
+
 import { TestRSC } from "@/components/TestRSC";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { Suspense } from "react";
@@ -14,7 +14,6 @@ export default async function Home() {
 
       <ManageSchedule />
 
-      <ExerciseCard />
       <AddExerciseCardServer initState={[]} />
     </main>
   );

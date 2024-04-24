@@ -18,12 +18,8 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useMemo, useState } from "react";
-import {
-  createUserExercise,
-  createUserSchedule,
-  getUserSchedule,
-  searchForExercise,
-} from "@/lib/helper/schedule";
+import { createUserSchedule, getUserSchedule } from "@/lib/helper/schedule";
+import { createUserExercise, searchForExercise } from "@/lib/helper/exercise";
 
 export function ManageSchedule() {
   const userScheduleQuery = useQuery({

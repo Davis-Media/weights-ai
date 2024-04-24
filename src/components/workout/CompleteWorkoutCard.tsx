@@ -6,12 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { completeWorkout } from "@/lib/helper/workout";
 import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
-import { SystemMessage } from "./Messages";
+import { SystemMessage } from "../Messages";
 
 export default function CompleteWorkoutCard({
   workoutId,

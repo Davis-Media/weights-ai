@@ -1,5 +1,5 @@
-import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
-import ExerciseCard from "@/components/ExerciseCard";
+import { AddExerciseCardServer } from "@/components/exercise/AddExerciseCardServer";
+import ExerciseCard from "@/components/exercise/ExerciseCard";
 import { TestRSC } from "@/components/TestRSC";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { Suspense } from "react";

@@ -21,11 +21,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { createWorkout } from "@/lib/db/helper";
 import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
-import { SystemMessage } from "./Messages";
+import { SystemMessage } from "../Messages";
+import { createWorkout } from "@/lib/helper/workout";
 
 export default function CreateWorkoutCard() {
   // TODO: make state cleaner, idc right now

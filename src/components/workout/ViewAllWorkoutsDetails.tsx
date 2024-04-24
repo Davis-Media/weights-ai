@@ -1,20 +1,21 @@
 "use client";
 
-import { setWorkoutInProgress } from "@/lib/db/helper";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
-import { SystemMessage } from "./Messages";
+import { SystemMessage } from "../Messages";
+import { setWorkoutInProgress } from "@/lib/helper/workout";
 
 export function ViewWorkoutDetails(props: {
   workout: {
-    id: string;
     name: string;
-    location: string;
     date: Date;
+    id: string;
+    profileId: string;
+    location: string;
     inProgress: boolean;
-    userId: string;
+    endedAt: Date | null;
   };
 }) {
   const { workout } = props;

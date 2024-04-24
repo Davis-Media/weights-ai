@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent } from "./ui/card";
-import { Separator } from "./ui/separator";
+import { Card, CardContent } from "../ui/card";
+import { Separator } from "../ui/separator";
 import {
   Table,
   TableBody,
@@ -9,22 +9,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import { Button } from "./ui/button";
-import { deleteSet } from "@/lib/db/helper";
+} from "../ui/table";
+import { Button } from "../ui/button";
 import { useState } from "react";
+import { deleteSet } from "@/lib/helper/sets";
 
 type WorkoutBreakdownProps = {
   workoutInfo: {
     date: Date;
     id: string;
-    location: string;
     name: string;
+    profileId: string;
+    location: string;
     inProgress: boolean;
-    userId: string;
+    endedAt: Date | null;
     sets: {
       id: string;
-      lift: string;
+      createdAt: Date;
+      userExerciseId: string;
       weight: number;
       reps: number;
       workoutId: string;
@@ -60,7 +62,9 @@ export async function WorkoutBreakdown(props: WorkoutBreakdownProps) {
             {sets.map((set, i) => {
               return (
                 <TableRow key={set.id}>
-                  <TableCell className="font-semibold">{set.lift}</TableCell>
+                  <TableCell className="font-semibold">
+                    {set.userExerciseId}
+                  </TableCell>
                   <TableCell>{set.weight}</TableCell>
                   <TableCell>{set.reps}</TableCell>
                   <TableCell>

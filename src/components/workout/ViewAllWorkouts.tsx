@@ -5,7 +5,6 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { getAllWorkouts } from "@/lib/db/helper";
 import { ViewWorkoutDetails } from "./ViewAllWorkoutsDetails";
 
 type ViewAllWorkoutsProps = {
@@ -13,9 +12,10 @@ type ViewAllWorkoutsProps = {
     name: string;
     date: Date;
     id: string;
+    profileId: string;
     location: string;
     inProgress: boolean;
-    userId: string;
+    endedAt: Date | null;
   }[];
 };
 

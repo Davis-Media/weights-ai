@@ -1,5 +1,5 @@
-import { getInProgressWorkout } from "@/lib/db/helper";
-import { Card } from "./ui/card";
+import { getInProgressWorkout } from "@/lib/helper/workout";
+import { Card } from "../ui/card";
 
 export async function CurrentWorkout() {
   const curWorkout = await getInProgressWorkout();

@@ -7,19 +7,20 @@ import {
   render,
 } from "ai/rsc";
 import z from "zod";
-import CreateWorkoutCard from "@/components/CreateWorkoutCard";
+import CreateWorkoutCard from "@/components/workout/CreateWorkoutCard";
 import { SystemMessage } from "@/components/Messages";
-import ViewAllWorkouts from "@/components/ViewAllWorkouts";
-import { AddExerciseCardServer } from "@/components/AddExerciseCardServer";
+import ViewAllWorkouts from "@/components/workout/ViewAllWorkouts";
+import { AddExerciseCardServer } from "@/components/exercise/AddExerciseCardServer";
+import { WorkoutBreakdown } from "@/components/workout/WorkoutBreakdown";
+import { Suspense } from "react";
+import { TestRSC } from "@/components/TestRSC";
+import CompleteWorkoutCard from "@/components/workout/CompleteWorkoutCard";
 import {
   getAllWorkouts,
   getInProgressWorkout,
   getWorkoutInfo,
-} from "@/lib/db/helper";
-import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
-import { Suspense } from "react";
-import { TestRSC } from "@/components/TestRSC";
-import CompleteWorkoutCard from "@/components/CompleteWorkoutCard";
+} from "@/lib/helper/workout";
+import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -138,33 +139,6 @@ async function submitUserMessage(userInput: string) {
                 message="Here is your current workout:"
               />
               <WorkoutBreakdown workoutInfo={workoutInfo} />
-            </div>
-          );
-        },
-      },
-      add_progress_picture: {
-        description:
-          "Allow the user to upload a progress picture of themselves for their workout",
-        parameters: z.object({}),
-        render: async function* () {
-          yield <div>fetching...</div>;
-
-          aiState.done([
-            ...aiState.get(),
-            {
-              role: "function",
-              name: "add_progress_picture",
-              content:
-                "provided the UI for the user to upload a progress picture",
-            },
-          ]);
-
-          return (
-            <div>
-              <SystemMessage
-                needsSep={false}
-                message="Upload your progress photo here!"
-              />
             </div>
           );
         },
@@ -316,6 +290,33 @@ async function submitUserMessage(userInput: string) {
                 message="Lets get your workout info ready, once you submit, your workout will automatically start!"
               />
               <CreateWorkoutCard />
+            </div>
+          );
+        },
+      },
+      manage_schedule: {
+        description:
+          "Allow the user to manage their schedule, set which exercises they want to do on each day of the week",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>LOADING...</div>;
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "manage_schedule",
+              content: "provided the UI for the user to manage their schedule",
+            },
+          ]);
+
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Lets get your workout info ready, once you submit, your workout will automatically start!"
+              />
+              <ManageSchedule />
             </div>
           );
         },

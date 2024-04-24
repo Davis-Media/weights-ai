@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CircleMinus, CirclePlus, Copy } from "lucide-react";
 import { useState } from "react";
-import { saveNewSets } from "@/lib/db/helper";
+import { saveNewSets } from "@/lib/helper/sets";
 
 export default function AddExerciseCardClient(props: {
   initState: {
@@ -177,7 +177,7 @@ export default function AddExerciseCardClient(props: {
             e.preventDefault();
 
             if (!hasSaved) {
-              await saveNewSets(createState);
+              // await saveNewSets(createState);
 
               setHasSaved(true);
             }

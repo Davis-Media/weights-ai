@@ -13,6 +13,7 @@ import {
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { deleteSet } from "@/lib/helper/sets";
+import { Trash } from "lucide-react";
 
 type WorkoutBreakdownProps = {
   workoutInfo: {
@@ -80,7 +81,9 @@ export function WorkoutBreakdown(props: WorkoutBreakdownProps) {
                   <TableCell>{set.weight}</TableCell>
                   <TableCell>{set.reps}</TableCell>
                   <TableCell>
-                    <Button onClick={() => submitDelete(set.id, i)}></Button>
+                    <Button onClick={() => submitDelete(set.id, i)}>
+                      <Trash className="w-5 h-5" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               );

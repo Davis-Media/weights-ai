@@ -5,6 +5,7 @@ import type { AI } from "../action";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserMessage } from "@/components/Messages";
+import { CurrentWorkout } from "@/components/workout/CurrentWorkout";
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
@@ -19,6 +20,8 @@ export default function Page() {
 
   return (
     <div className="w-full h-screen flex flex-col relative">
+      <CurrentWorkout />
+
       <div className="md:w-[800px] mx-auto flex flex-col items-start px-4">
         {
           // View messages in UI state

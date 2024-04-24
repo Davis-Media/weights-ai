@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { NavBar } from "@/components/layout/NavBar";
 import "./globals.css";
 import { AI } from "./action";
-import { CurrentWorkout } from "@/components/workout/CurrentWorkout";
 import Providers from "./providers";
+import { Rethink_Sans } from "next/font/google";
+import { Chivo } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+const rethink_sans = Rethink_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-rethink_sans",
+});
+const chivo = Chivo({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-chivo",
+});
 
 export const metadata: Metadata = {
   title: "Weights AI",
@@ -21,9 +31,9 @@ export default function RootLayout({
     <html lang="en">
       <AI>
         <Providers>
-          <body className={`${inter.className}`}>
+          <body className={rethink_sans.variable + chivo.variable}>
+            <NavBar />
             {/* scuffed as all hell, but whatever */}
-            <CurrentWorkout />
             {children}
           </body>
         </Providers>

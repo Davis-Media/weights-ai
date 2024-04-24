@@ -6,6 +6,7 @@ import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
 import { setWorkoutInProgress } from "@/lib/helper/workout";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function ViewWorkoutDetails(props: {
   workout: {
@@ -21,7 +22,7 @@ export function ViewWorkoutDetails(props: {
   const { workout } = props;
   const [_, setMessages] = useUIState<typeof AI>();
 
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   return (
     <div className="flex flex-row items-center p-4 gap-4" key={workout.id}>
@@ -57,7 +58,8 @@ export function ViewWorkoutDetails(props: {
                 ),
               },
             ]);
-            router.refresh();
+
+            queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
           }}
         >
           Activate

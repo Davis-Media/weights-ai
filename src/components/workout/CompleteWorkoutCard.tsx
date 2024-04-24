@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CompleteWorkoutCard({
   workoutId,
@@ -20,6 +21,8 @@ export default function CompleteWorkoutCard({
 }) {
   const [_, setMessages] = useUIState<typeof AI>();
   const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const submit = async () => {
     console.log("Submitting workout");
@@ -32,7 +35,7 @@ export default function CompleteWorkoutCard({
         display: <SystemMessage needsSep={true} message="Workout completed!" />,
       },
     ]);
-    router.refresh();
+    queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
   };
 
   return (

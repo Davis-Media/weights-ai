@@ -26,6 +26,7 @@ import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
 import { createWorkout } from "@/lib/helper/workout";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CreateWorkoutCard() {
   // TODO: make state cleaner, idc right now
@@ -34,7 +35,7 @@ export default function CreateWorkoutCard() {
   const [date, setDate] = useState(new Date());
   const [inProgress, setInProgress] = useState(false);
   const [_, setMessages] = useUIState<typeof AI>();
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const submit = async () => {
     const res = await createWorkout({ name, location, date, inProgress });
@@ -47,7 +48,7 @@ export default function CreateWorkoutCard() {
         ),
       },
     ]);
-    router.refresh();
+    queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
 
     console.log("workout created! id:", res.nId);
   };

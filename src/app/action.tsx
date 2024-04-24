@@ -19,6 +19,7 @@ import {
 import { WorkoutBreakdown } from "@/components/WorkoutBreakdown";
 import { Suspense } from "react";
 import { TestRSC } from "@/components/TestRSC";
+import CompleteWorkoutCard from "@/components/CompleteWorkoutCard";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -242,6 +243,52 @@ async function submitUserMessage(userInput: string) {
                 message="Here are all of your workouts!"
               />
               <ViewAllWorkouts workouts={workouts} />
+            </div>
+          );
+        },
+      },
+      complete_workout: {
+        description: "Allow the user to finish/complete their workout",
+        parameters: z.object({}),
+        render: async function* () {
+          yield <div>fetching...</div>;
+
+          const curWorkout = await getInProgressWorkout();
+
+          if (!curWorkout) {
+            aiState.done([
+              ...aiState.get(),
+              {
+                role: "function",
+                name: "complete_workout",
+                content:
+                  "the user does not have a currently active workout, so we cannot complete it",
+              },
+            ]);
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="No currently active workout..."
+              />
+            );
+          }
+
+          aiState.done([
+            ...aiState.get(),
+            {
+              role: "function",
+              name: "complete_workout",
+              content: "provided the UI for the user to complete their workout",
+            },
+          ]);
+
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="Are you ready to finish your workout?"
+              />
+              <CompleteWorkoutCard workoutId={curWorkout.id} />
             </div>
           );
         },

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { createWorkout } from "@/lib/db/helper";
+import { useRouter } from "next/navigation";
+import { useUIState } from "ai/rsc";
+import { AI } from "@/app/action";
+import { SystemMessage } from "./Messages";
 
 export default function CreateWorkoutCard() {
   // TODO: make state cleaner, idc right now
@@ -29,11 +33,21 @@ export default function CreateWorkoutCard() {
   const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [inProgress, setInProgress] = useState(false);
+  const [_, setMessages] = useUIState<typeof AI>();
+  const router = useRouter();
 
   const submit = async () => {
-    console.log({ name, location, date, inProgress });
-
     const res = await createWorkout({ name, location, date, inProgress });
+
+    setMessages([
+      {
+        id: new Date().getMilliseconds(),
+        display: (
+          <SystemMessage needsSep={true} message="Created new workout!" />
+        ),
+      },
+    ]);
+    router.refresh();
 
     console.log("workout created! id:", res.nId);
   };

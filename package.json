@@ -33,7 +33,6 @@
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.30.7",
     "lucide-react": "^0.363.0",
-    "nanoid": "^5.0.6",
     "next": "14.2.0-canary.43",
     "openai": "^4.29.2",
     "postgres": "^3.4.4",

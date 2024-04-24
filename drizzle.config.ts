@@ -5,7 +5,7 @@ export default defineConfig({
   driver: "pg",
   out: "./supabase/migrations",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL ?? "",
+    connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
   },
   verbose: true,
   strict: true,

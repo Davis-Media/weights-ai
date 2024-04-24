@@ -3,42 +3,74 @@ import {
   boolean,
   integer,
   pgTable,
+  text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const userExercise = pgTable("user_exercise", {
-  id: varchar("id", { length: 100 }).primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  userId: varchar("user_id").notNull(),
+export const profile = pgTable("profile", {
+  // MATCHES USER ID FROM SUPABASE AUTH
+  id: uuid("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull()
+    .$defaultFn(() => new Date()),
 });
 
-export const userExerciseRelations = relations(userExercise, ({ many }) => {
-  return {
-    userScheduleEntries: many(userScheduleEntry),
-    sets: many(set),
-  };
+export const profileRelations = relations(profile, ({ many }) => ({
+  userExercises: many(userExercise),
+  userSchedules: many(userSchedule),
+  workouts: many(workout),
+}));
+
+export const userExercise = pgTable("user_exercise", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  profileId: uuid("profile_id").notNull().references(() => profile.id),
 });
+
+export const userExerciseRelations = relations(
+  userExercise,
+  ({ many, one }) => {
+    return {
+      userScheduleEntries: many(userScheduleEntry),
+      sets: many(set),
+      profile: one(profile, {
+        fields: [userExercise.profileId],
+        references: [profile.id],
+      }),
+    };
+  },
+);
 
 export const userSchedule = pgTable("user_schedule", {
-  id: varchar("id", { length: 100 }).primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // NOTE: sunday = 0
   day: integer("day").notNull(),
-  userId: varchar("user_id").notNull(),
+  profileId: uuid("profile_id").notNull().references(() => profile.id),
 });
 
-export const userScheduleRelations = relations(userSchedule, ({ many }) => {
-  return {
-    userScheduleEntries: many(userScheduleEntry),
-  };
-});
+export const userScheduleRelations = relations(
+  userSchedule,
+  ({ many, one }) => {
+    return {
+      userScheduleEntries: many(userScheduleEntry),
+      profile: one(profile, {
+        fields: [userSchedule.profileId],
+        references: [profile.id],
+      }),
+    };
+  },
+);
 
 export const userScheduleEntry = pgTable("user_schedule_entry", {
-  id: varchar("id", { length: 100 }).primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   order: integer("order").notNull(),
-  userExerciseId: varchar("user_exercise_id", { length: 100 }).notNull()
+  userExerciseId: uuid("user_exercise_id").notNull()
     .references(() => userExercise.id),
-  userScheduleId: varchar("user_schedule_id", { length: 100 }).notNull()
+  userScheduleId: uuid("user_schedule_id").notNull()
     .references(() => userSchedule.id),
 });
 
@@ -57,32 +89,41 @@ export const userScheduleEntryRelations = relations(
 );
 
 export const workout = pgTable("workout", {
-  id: varchar("id", { length: 255 }).primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   date: timestamp("date", { withTimezone: true }).notNull(),
-  location: varchar("location", { length: 500 }).notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
+  location: text("location").notNull(),
+  name: text("name").notNull(),
   inProgress: boolean("in_progress").default(false).notNull(),
   endedAt: timestamp("ended_at", { withTimezone: true }),
-  userId: varchar("user_id").notNull(),
+  profileId: uuid("profile_id").notNull().references(() => profile.id),
 });
 
-export const workoutRelations = relations(workout, ({ many }) => ({
+export const workoutRelations = relations(workout, ({ many, one }) => ({
   sets: many(set),
+  profile: one(profile, {
+    fields: [workout.profileId],
+    references: [profile.id],
+  }),
 }));
 
 export const set = pgTable("set", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull()
+    .$defaultFn(() => new Date()),
   weight: integer("weight").notNull(),
   reps: integer("reps").notNull(),
-  userExerciseId: varchar("user_exercise_id", { length: 100 }).notNull()
+  userExerciseId: uuid("user_exercise_id").notNull()
     .references(() => userExercise.id),
-  workoutId: varchar("workout_id", { length: 255 })
+  workoutId: uuid("workout_id")
     .references(() => workout.id)
     .notNull(),
 });
 
 export const setRelations = relations(set, ({ one }) => ({
+  userExercise: one(userExercise, {
+    fields: [set.userExerciseId],
+    references: [userExercise.id],
+  }),
   workout: one(workout, {
     fields: [set.workoutId],
     references: [workout.id],

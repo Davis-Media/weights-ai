@@ -1,18 +1,59 @@
 {
-  "id": "00f363ce-7913-4e03-b438-8f723f4ff36c",
+  "id": "b87ecb55-cd3c-47c2-bd54-87307bc40b8e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
+    "profile": {
+      "name": "profile",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "set": {
       "name": "set",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "created_at": {
           "name": "created_at",
@@ -34,13 +75,13 @@
         },
         "user_exercise_id": {
           "name": "user_exercise_id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "workout_id": {
           "name": "workout_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
@@ -83,25 +124,40 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar",
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_exercise_profile_id_profile_id_fk": {
+          "name": "user_exercise_profile_id_profile_id_fk",
+          "tableFrom": "user_exercise",
+          "tableTo": "profile",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -111,9 +167,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "day": {
           "name": "day",
@@ -121,15 +178,29 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar",
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_schedule_profile_id_profile_id_fk": {
+          "name": "user_schedule_profile_id_profile_id_fk",
+          "tableFrom": "user_schedule",
+          "tableTo": "profile",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -139,9 +210,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "order": {
           "name": "order",
@@ -151,13 +223,13 @@
         },
         "user_exercise_id": {
           "name": "user_exercise_id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "user_schedule_id": {
           "name": "user_schedule_id",
-          "type": "varchar(100)",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
@@ -200,9 +272,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "date": {
           "name": "date",
@@ -212,13 +285,13 @@
         },
         "location": {
           "name": "location",
-          "type": "varchar(500)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -235,15 +308,29 @@
           "primaryKey": false,
           "notNull": false
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar",
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "workout_profile_id_profile_id_fk": {
+          "name": "workout_profile_id_profile_id_fk",
+          "tableFrom": "workout",
+          "tableTo": "profile",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }

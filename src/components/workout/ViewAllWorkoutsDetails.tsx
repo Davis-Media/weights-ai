@@ -40,7 +40,7 @@ export function ViewWorkoutDetails(props: {
       <div className="flex flex-row items-center space-x-2 ml-auto">
         <div
           className={`w-2 h-2 rounded-full ${
-            workout.inProgress ? "bg-yellow-500" : "bg-green-500"
+            workout.inProgress ? "bg-blue-500" : "bg-red-500"
           }`}
         />
         <Button

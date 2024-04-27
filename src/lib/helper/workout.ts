@@ -1,6 +1,5 @@
 "use server";
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
 import { db } from "../db";
 import { workout } from "../db/schema";
 import { and, eq } from "drizzle-orm";

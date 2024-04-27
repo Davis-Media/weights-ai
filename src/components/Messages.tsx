@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Separator } from "./ui/separator";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/sb/client";
 import { type User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 

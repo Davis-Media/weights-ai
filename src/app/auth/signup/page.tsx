@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { signUpWithEmail } from "@/lib/supabase/helper";
+import { signUpWithEmail } from "@/lib/sb/helper";
 import { useState } from "react";
 
 export default function Component() {

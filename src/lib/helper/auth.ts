@@ -1,6 +1,6 @@
 "use server";
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/sb/server";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { profile } from "../db/schema";

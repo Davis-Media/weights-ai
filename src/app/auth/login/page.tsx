@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { signInWithEmail, signInWithGithub } from "@/lib/supabase/helper";
+import { signInWithEmail, signInWithGithub } from "@/lib/sb/helper";
 import { useState } from "react";
 import Link from "next/link";
 

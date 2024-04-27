@@ -10,7 +10,8 @@
     "db:push": "drizzle-kit push:pg --config=drizzle.config.ts",
     "db:studio": "drizzle-kit studio",
     "db:diff": "supabase db diff -f new_push",
-    "db:generate": "drizzle-kit generate:pg"
+    "db:generate": "drizzle-kit generate:pg",
+    "db:generate:types": "supabase gen types typescript --local > supabase/functions/_shared/database.types.ts && supabase gen types typescript --local > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -25,6 +26,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.42.0",
+    "@t3-oss/env-nextjs": "^0.10.1",
     "@tanstack/react-query": "^5.29.2",
     "ai": "^3.0.2",
     "class-variance-authority": "^0.7.0",
@@ -44,7 +46,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.7.0",
     "vaul": "^0.9.0",
-    "zod": "^3.22.4"
+    "zod": "^3.23.4"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

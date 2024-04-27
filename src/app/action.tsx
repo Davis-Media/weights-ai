@@ -23,13 +23,11 @@ import {
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
 import { getUserScheduleOneDay } from "@/lib/helper/schedule";
-import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
-import { userExercise } from "@/lib/db/schema";
 import { getOrCreateProfile } from "@/lib/helper/auth";
+import { env } from "@/env";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: env.OPENAI_API_KEY,
 });
 
 async function submitUserMessage(userInput: string) {
@@ -187,64 +185,54 @@ async function submitUserMessage(userInput: string) {
         render: async function* (props) {
           yield <div>fetching...</div>;
 
-          // need to match the user input to one of their current exercises
-          const allUserExercises = await db.query.userExercise.findMany({
-            where: eq(userExercise.profileId, profile.id),
-          });
-
-          const testArray = allUserExercises.map((exercise) => exercise.name);
-
           const sendData: {
             exerciseId: string;
             reps: number;
             weight: number;
           }[] = [];
 
-          let errorMsg: string | null = null;
-          // Ask OpenAI for a streaming chat completion given the prompt
-          const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            stream: false,
-            messages: [
-              {
-                content: `I need you to figure out which entry of this array best matches the string. Please just return a number (the index) and NOTHING else. THE ARRAY: ${testArray.toString()} THE QUERY: ${
-                  props.exercise
-                }`,
-                role: "user",
+          // search using the edge function
+          const supabaseURL = env.NEXT_PUBLIC_SUPABASE_URL;
+          const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+          const res = await fetch(
+            `${supabaseURL}/functions/v1/search-exercise`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${supabaseAnonKey}`,
               },
-            ],
-          });
-
-          // try and parse the response
-          const selectedIndex = parseInt(
-            response.choices[0].message.content ?? "NOT FOUND"
+              body: JSON.stringify({
+                search: props.exercise,
+                profile_id: profile.id,
+              }),
+            }
           );
 
-          if (isNaN(selectedIndex)) {
-            errorMsg =
-              "I couldn't find a match for that exercise, please try again! You can choose from the following exercises: " +
-              testArray.toString();
-            +" To add more do so in your schedule!";
-          } else {
-            sendData.push({
-              exerciseId: allUserExercises[selectedIndex].id,
-              reps: props.reps,
-              weight: props.weight,
-            });
+          const data = (await res.json()) as {
+            search: string;
+            result: {
+              name: string;
+              id: string;
+            }[];
+          };
+
+          if (!data.result.length) {
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="I couldn't find that exercise, please try again!"
+              />
+            );
           }
 
-          if (errorMsg) {
-            aiState.done([
-              ...aiState.get(),
-              {
-                role: "function",
-                name: "add_sets",
-                content:
-                  "the user did not provide a valid exercise, please try again!",
-              },
-            ]);
-            return <SystemMessage needsSep={true} message={errorMsg} />;
-          }
+          const selectedExercise = data.result[0];
+
+          sendData.push({
+            exerciseId: selectedExercise.id,
+            reps: props.reps,
+            weight: props.weight,
+          });
 
           aiState.done([
             ...aiState.get(),

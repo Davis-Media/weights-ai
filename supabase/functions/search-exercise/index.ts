@@ -13,8 +13,9 @@ const supabase = createClient<Database>(
 const model = new Supabase.ai.Session("gte-small");
 
 Deno.serve(async (req) => {
-  const { search } = await req.json();
+  const { search, profile_id } = await req.json();
   if (!search) return new Response("Please provide a search param!");
+  if (!profile_id) return new Response("Please provide a profile_id param!");
   // Generate embedding for search term.
   const embedding = await model.run(search, {
     mean_pool: true,
@@ -23,12 +24,13 @@ Deno.serve(async (req) => {
 
   // Query embeddings.
   const { data: result, error } = await supabase
-    .rpc("query_embeddings", {
+    .rpc("query_embeddings_user_exercise", {
       search_embedding: JSON.stringify(embedding),
       match_threshold: 0.8,
+      search_profile_id: profile_id,
     })
-    .select("id, content")
-    .limit(3);
+    .select("name, id")
+    .limit(1);
   if (error) {
     return Response.json(error);
   }

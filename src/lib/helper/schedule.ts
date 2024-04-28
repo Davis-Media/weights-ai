@@ -58,6 +58,7 @@ export const getUserScheduleDay = async (scheduleId: string) => {
     columns: {
       day: true,
       id: true,
+      name: true,
     },
     with: {
       userScheduleEntries: {
@@ -97,6 +98,7 @@ export const getUserSchedule = async () => {
     columns: {
       day: true,
       id: true,
+      name: true,
     },
     with: {
       userScheduleEntries: {
@@ -114,6 +116,7 @@ export const getUserSchedule = async () => {
       return {
         day: se.day,
         id: se.id,
+        name: se.name,
         exercises: se.userScheduleEntries.length,
       };
     }),
@@ -122,6 +125,7 @@ export const getUserSchedule = async () => {
 
 export const updateUserSchedule = async (data: {
   scheduleId: string;
+  name: string;
   exercises: {
     exerciseId: string;
     order: number;
@@ -150,6 +154,11 @@ export const updateUserSchedule = async (data: {
     };
   }));
 
+  // update the schedule name
+  await db.update(userSchedule).set({ name: data.name }).where(
+    eq(userSchedule.id, data.scheduleId),
+  );
+
   return {
     success: true,
     message: "Schedule updated!",
@@ -157,6 +166,7 @@ export const updateUserSchedule = async (data: {
 };
 
 export const createUserSchedule = async (data: {
+  name: string;
   day: number;
   exercises: {
     exerciseId: string;
@@ -190,6 +200,7 @@ export const createUserSchedule = async (data: {
   const insertedSchedule = await db.insert(userSchedule).values({
     profileId: profile.id,
     day: data.day,
+    name: data.name,
   }).returning({ insertedId: userSchedule.id });
 
   // insert the exercises

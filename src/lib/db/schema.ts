@@ -53,6 +53,7 @@ export const userSchedule = pgTable("user_schedule", {
   id: uuid("id").primaryKey().defaultRandom(),
   // NOTE: sunday = 0
   day: integer("day").notNull(),
+  name: text("name").notNull().default("Big Lift"),
   profileId: uuid("profile_id").notNull().references(() => profile.id),
 });
 

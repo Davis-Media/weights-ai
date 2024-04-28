@@ -39,11 +39,12 @@ export function ViewWorkoutDetails(props: {
       <div className="flex flex-row items-center space-x-2 ml-auto">
         <div
           className={`w-2 h-2 rounded-full ${
-            workout.inProgress ? "bg-blue-500" : "bg-red-500"
+            workout.inProgress ? "bg-green-500" : "bg-red-500"
           }`}
         />
         <Button
           size="sm"
+          disabled={workout.inProgress}
           onClick={async () => {
             await setWorkoutInProgress(workout.id);
             setMessages([
@@ -58,10 +59,15 @@ export function ViewWorkoutDetails(props: {
               },
             ]);
 
-            queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
+            await queryClient.invalidateQueries({
+              queryKey: ["currentWorkout"],
+            });
+            await queryClient.invalidateQueries({
+              queryKey: ["active_workout"],
+            });
           }}
         >
-          Activate
+          {workout.inProgress ? "In Progress..." : "Start"}
         </Button>
       </div>
     </div>

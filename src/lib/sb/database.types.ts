@@ -154,16 +154,19 @@ export type Database = {
         Row: {
           day: number
           id: string
+          name: string
           profile_id: string
         }
         Insert: {
           day: number
           id?: string
+          name?: string
           profile_id: string
         }
         Update: {
           day?: number
           id?: string
+          name?: string
           profile_id?: string
         }
         Relationships: [

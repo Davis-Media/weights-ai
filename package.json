@@ -11,7 +11,7 @@
     "db:studio": "drizzle-kit studio",
     "db:diff": "supabase db diff -f new_push",
     "db:generate": "drizzle-kit generate:pg",
-    "db:generate:types": "supabase gen types typescript --local > supabase/functions/_shared/database.types.ts && supabase gen types typescript --local > src/lib/supabase/database.types.ts"
+    "db:generate:types": "supabase gen types typescript --local > supabase/functions/_shared/database.types.ts && supabase gen types typescript --local > src/lib/sb/database.types.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",

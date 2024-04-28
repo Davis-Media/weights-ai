@@ -2,7 +2,7 @@
 import "server-only";
 import { db } from "../db";
 import { workout } from "../db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getOrCreateProfile } from "./auth";
 
 export const completeWorkout = async (workoutId: string) => {
@@ -108,6 +108,7 @@ export const getAllWorkouts = async () => {
 
   const workouts = await db.query.workout.findMany({
     where: eq(workout.profileId, profile.id),
+    orderBy: desc(workout.date),
   });
 
   return workouts;

@@ -1,11 +1,15 @@
 "use client";
 import Image from "next/image";
-import { Separator } from "./ui/separator";
 import { createClient } from "@/lib/sb/client";
 import { type User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import { Separator } from "./ui/separator";
 
-export function SystemMessage(props: { message: string; needsSep: boolean }) {
+export function SystemMessage(props: {
+  message: string;
+  needsSep: boolean;
+  richMessage?: ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-2 py-3">
       <div className="flex gap-2">
@@ -19,6 +23,7 @@ export function SystemMessage(props: { message: string; needsSep: boolean }) {
         <h2 className="font-bold text-lg text-slate-900">Workout Assistant</h2>
       </div>
       <p>{props.message}</p>
+      {props.richMessage}
       {props.needsSep && <Separator />}
     </div>
   );

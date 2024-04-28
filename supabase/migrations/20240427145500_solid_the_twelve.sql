@@ -1,0 +1,1 @@
+ALTER TABLE "user_schedule" ADD COLUMN "name" text DEFAULT 'Big Lift' NOT NULL;

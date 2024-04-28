@@ -47,7 +47,7 @@ async function submitUserMessage(userInput: string) {
       id: Date.now(),
       display: (
         <SystemMessage
-          message="You are not allowed to do this! COMING SOON"
+          message="Weights AI is not currently available for users. Please contact me for access, or try again later!"
           needsSep={true}
         />
       ),
@@ -184,6 +184,18 @@ async function submitUserMessage(userInput: string) {
           .required(),
         render: async function* (props) {
           yield <div>fetching...</div>;
+
+          // check if there is a current workout
+          const curWorkout = await getInProgressWorkout();
+
+          if (!curWorkout) {
+            return (
+              <SystemMessage
+                needsSep={true}
+                message="No currently active workout..."
+              />
+            );
+          }
 
           const sendData: {
             exerciseId: string;
@@ -445,8 +457,23 @@ export const initialUIState: {
     id: Date.now(),
     display: (
       <SystemMessage
-        message="Hi! I am a personal workout logging system. The way this works is you can create workouts, activate them, then add your sets! Let me know how I can be of help."
+        message=""
         needsSep={true}
+        richMessage={
+          <div className="flex flex-col gap-2">
+            <p className="text-neutral-900 text-lg italic">
+              Hi! I am a personal workout logging system.
+            </p>
+            <p>Right how I have three main functions:</p>
+            <p className="font-bold">1. Create a new workout</p>
+            <p className="font-bold">2. Add sets to a workout</p>
+            <p className="font-bold">3. Manage your schedule</p>
+            <p>
+              Before you start your workout, you first need to create your
+              schedule, then create your workout, then you are ready to go!
+            </p>
+          </div>
+        }
       />
     ),
   },

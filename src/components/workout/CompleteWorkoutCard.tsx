@@ -35,7 +35,12 @@ export default function CompleteWorkoutCard({
         display: <SystemMessage needsSep={true} message="Workout completed!" />,
       },
     ]);
-    queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["currentWorkout"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["active_workout"],
+    });
   };
 
   return (

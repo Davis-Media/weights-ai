@@ -62,7 +62,7 @@ export function ManageSchedule() {
               <div key={userSch.id}>
                 <div className="flex justify-between items-center">
                   <h3 className="text-slate-800 font-bold text-lg">
-                    {daysOfWeek[userSch.day]}
+                    {daysOfWeek[userSch.day]} - {userSch.name}
                   </h3>
                   <div className="flex items-center gap-2">
                     <h4 className="text-slate-600 text-sm italic">
@@ -92,6 +92,8 @@ function EditDay(props: { scheduleId: string }) {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const [dayName, setDayName] = useState("");
+
   const dayQuery = useQuery({
     queryKey: ["user_schedule_day", scheduleId],
     queryFn: async () => {
@@ -100,6 +102,8 @@ function EditDay(props: { scheduleId: string }) {
       if (!res.data) {
         throw new Error(res.message);
       }
+
+      setDayName(res.data.name);
 
       setSelectedExercises(
         res.data.userScheduleEntries.map((se) => {
@@ -184,6 +188,7 @@ function EditDay(props: { scheduleId: string }) {
     mutationFn: async () => {
       const res = await updateUserSchedule({
         scheduleId,
+        name: dayName,
         exercises: selectedExercises.map((selEx) => ({
           exerciseId: selEx.id,
           order: selEx.order,
@@ -297,6 +302,17 @@ function EditDay(props: { scheduleId: string }) {
             })}
           </div>
 
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="name">Day Name</Label>
+            <Input
+              type="text"
+              id="name"
+              placeholder="Push Day"
+              value={dayName}
+              onChange={(e) => setDayName(e.target.value)}
+            />
+          </div>
+
           <Separator />
 
           <div className="relative">
@@ -348,18 +364,27 @@ function EditDay(props: { scheduleId: string }) {
                 <Button
                   variant={"ghost"}
                   className="justify-start"
+                  disabled={createExerciseMutation.isPending}
                   onClick={() =>
                     createExerciseMutation.mutate(exerciseSearchQuery)
                   }
                 >
-                  CREATE: {exerciseSearchQuery}
+                  {createExerciseMutation.isPending
+                    ? "Creating..."
+                    : `CREATE: ${exerciseSearchQuery}`}
                 </Button>
               </div>
             )}
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => updateScheduleMutation.mutate()}>Save</Button>
+          <Button
+            onClick={() => updateScheduleMutation.mutate()}
+            disabled={updateScheduleMutation.isPending}
+          >
+            {updateScheduleMutation.isPending ? "Saving..." : "Save"}
+          </Button>
+
           <Button variant={"secondary"} onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
@@ -393,6 +418,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
       }
 
       const res = await createUserSchedule({
+        name: dayName,
         day: selectedDay,
         exercises: selectedExercises.map((selEx) => ({
           exerciseId: selEx.id,
@@ -465,6 +491,8 @@ function CreateNewDay(props: { takenDays: number[] }) {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const [dayName, setDayName] = useState("");
+
   return (
     <Dialog open={isOpen} onOpenChange={(v) => setIsOpen(v)}>
       <Button onClick={() => setIsOpen(true)}>Add Day</Button>
@@ -532,6 +560,17 @@ function CreateNewDay(props: { takenDays: number[] }) {
                 Sat
               </ToggleGroupItem>
             </ToggleGroup>
+          </div>
+
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="name">Day Name</Label>
+            <Input
+              type="text"
+              id="name"
+              placeholder="Push Day"
+              value={dayName}
+              onChange={(e) => setDayName(e.target.value)}
+            />
           </div>
 
           <Separator />
@@ -659,18 +698,26 @@ function CreateNewDay(props: { takenDays: number[] }) {
                 <Button
                   variant={"ghost"}
                   className="justify-start"
+                  disabled={createExerciseMutation.isPending}
                   onClick={() =>
                     createExerciseMutation.mutate(exerciseSearchQuery)
                   }
                 >
-                  CREATE: {exerciseSearchQuery}
+                  {createExerciseMutation.isPending
+                    ? "Creating..."
+                    : `CREATE: ${exerciseSearchQuery}`}
                 </Button>
               </div>
             )}
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => createScheduleMutation.mutate()}>Save</Button>
+          <Button
+            onClick={() => createScheduleMutation.mutate()}
+            disabled={createScheduleMutation.isPending}
+          >
+            {createScheduleMutation.isPending ? "Saving..." : "Save"}
+          </Button>
           <Button variant={"secondary"} onClick={() => setIsOpen(false)}>
             Cancel
           </Button>

@@ -2,14 +2,17 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
+import { headers } from "next/headers";
 
 export const signInWithGithub = async () => {
   const supabase = createClient();
 
+  const origin = headers().get("origin");
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: "/auth/callback",
+      redirectTo: `${origin}/auth/callback`,
     },
   });
 

@@ -19,6 +19,16 @@ export const profile = pgTable("profile", {
   lastName: text("last_name").notNull(),
   email: text("email").notNull(),
   role: roleEnum("role").notNull().default("user"),
+  stripeCustomerId: text("stripe_customer_id"),
+  proPaymentId: text("pro_payment_id"),
+  freeTrialEndsAt: timestamp("free_trial_ends_at", { withTimezone: true })
+    .notNull().$defaultFn(() => {
+      const currentDate = new Date();
+      const futureDate = new Date(
+        currentDate.getTime() + (7 * 24 * 60 * 60 * 1000),
+      );
+      return futureDate;
+    }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull()
     .$defaultFn(() => new Date()),
 });

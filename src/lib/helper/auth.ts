@@ -5,6 +5,14 @@ import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { profile } from "../db/schema";
 
+export const getIsUserPro = async () => {
+  const { profile } = await getOrCreateProfile();
+
+  if (!profile) {
+    return false;
+  }
+};
+
 export const getOrCreateProfile = async () => {
   const supabase = createClient();
 

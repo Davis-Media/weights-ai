@@ -19,11 +19,11 @@ import {
   getAllWorkouts,
   getInProgressWorkout,
   getWorkoutInfo,
-} from "@/lib/helper/workout";
+} from "@/server/helper/workout";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
-import { getUserScheduleOneDay } from "@/lib/helper/schedule";
-import { getOrCreateProfile } from "@/lib/helper/auth";
+import { getUserScheduleOneDay } from "@/server/helper/schedule";
+import { getOrCreateProfile } from "@/server/helper/auth";
 import { env } from "@/env";
 
 const openai = new OpenAI({

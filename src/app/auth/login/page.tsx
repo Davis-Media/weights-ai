@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { signInWithGithub } from "@/lib/sb/helper";
+import { signInWithGithub } from "@/server/sb/helper";
 
 export default function Component() {
   return (

@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { setWorkoutInProgress } from "@/lib/helper/workout";
+import { setWorkoutInProgress } from "@/server/helper/workout";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function ViewWorkoutDetails(props: {

@@ -20,8 +20,8 @@ import { Button } from "@/components/ui/button";
 import { CircleMinus, Copy } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllUserExercises } from "@/lib/helper/exercise";
-import { saveNewSets } from "@/lib/helper/sets";
+import { getAllUserExercises } from "@/server/helper/exercise";
+import { saveNewSets } from "@/server/helper/sets";
 
 export default function AddExerciseCardClient(props: {
   initState: {

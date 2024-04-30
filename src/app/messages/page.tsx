@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { UserMessage } from "@/components/Messages";
 import { CurrentWorkout } from "@/components/workout/CurrentWorkout";
 import { useQuery } from "@tanstack/react-query";
-import { getInProgressWorkout } from "@/lib/helper/workout";
+import { getInProgressWorkout } from "@/server/helper/workout";
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");

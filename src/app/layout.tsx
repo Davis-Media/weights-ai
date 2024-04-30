@@ -5,6 +5,7 @@ import { AI } from "./action";
 import Providers from "./providers";
 import { Rethink_Sans } from "next/font/google";
 import { Chivo } from "next/font/google";
+import { TRPCReactProvider } from "@/trpc/react";
 
 const rethink_sans = Rethink_Sans({
   subsets: ["latin"],
@@ -31,11 +32,13 @@ export default function RootLayout({
     <html lang="en">
       <AI>
         <Providers>
-          <body className={rethink_sans.variable + chivo.variable}>
-            <NavBar />
-            {/* scuffed as all hell, but whatever */}
-            {children}
-          </body>
+          <TRPCReactProvider>
+            <body className={rethink_sans.variable + chivo.variable}>
+              <NavBar />
+              {/* scuffed as all hell, but whatever */}
+              {children}
+            </body>
+          </TRPCReactProvider>
         </Providers>
       </AI>
     </html>

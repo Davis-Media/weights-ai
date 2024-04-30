@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { createWorkout } from "@/lib/helper/workout";
+import { createWorkout } from "@/server/helper/workout";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function CreateWorkoutCard() {

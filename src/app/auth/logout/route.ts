@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/sb/server";
+import { createClient } from "@/server/sb/server";
 
 export async function GET(request: Request) {
   const { origin } = new URL(request.url);

@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "../ui/button";
-import { completeWorkout } from "@/lib/helper/workout";
+import { completeWorkout } from "@/server/helper/workout";
 import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";

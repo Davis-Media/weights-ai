@@ -1,6 +1,6 @@
 "use client";
 
-import { getInProgressWorkout } from "@/lib/helper/workout";
+import { getInProgressWorkout } from "@/server/helper/workout";
 import { Card } from "../ui/card";
 import { useQuery } from "@tanstack/react-query";
 

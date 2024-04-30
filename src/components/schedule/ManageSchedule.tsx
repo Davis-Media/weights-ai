@@ -21,8 +21,11 @@ import {
   getUserSchedule,
   getUserScheduleDay,
   updateUserSchedule,
-} from "@/lib/helper/schedule";
-import { createUserExercise, searchForExercise } from "@/lib/helper/exercise";
+} from "@/server/helper/schedule";
+import {
+  createUserExercise,
+  searchForExercise,
+} from "@/server/helper/exercise";
 
 export function ManageSchedule() {
   const userScheduleQuery = useQuery({

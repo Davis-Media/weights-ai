@@ -12,7 +12,7 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { deleteSet } from "@/lib/helper/sets";
+import { deleteSet } from "@/server/helper/sets";
 import { Trash } from "lucide-react";
 
 type WorkoutBreakdownProps = {

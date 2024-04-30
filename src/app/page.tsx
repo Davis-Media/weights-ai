@@ -1,8 +1,12 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { api } from "@/trpc/react";
 
 export default function Component() {
+  const testQuery = api.hello.useQuery({ text: "test" });
+
+  console.log(testQuery.data);
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <main className="flex-1">

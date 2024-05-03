@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { NavBar } from "@/components/layout/NavBar";
 import "./globals.css";
 import { AI } from "./action";
-import Providers from "./providers";
 import { Rethink_Sans } from "next/font/google";
 import { Chivo } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
@@ -31,15 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AI>
-        <Providers>
-          <TRPCReactProvider>
-            <body className={rethink_sans.variable + chivo.variable}>
-              <NavBar />
-              {/* scuffed as all hell, but whatever */}
-              {children}
-            </body>
-          </TRPCReactProvider>
-        </Providers>
+        <TRPCReactProvider>
+          <body className={rethink_sans.variable + chivo.variable}>
+            <NavBar />
+            {/* scuffed as all hell, but whatever */}
+            {children}
+          </body>
+        </TRPCReactProvider>
       </AI>
     </html>
   );

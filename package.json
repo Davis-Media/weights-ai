@@ -11,7 +11,8 @@
     "db:studio": "drizzle-kit studio",
     "db:diff": "supabase db diff -f new_push",
     "db:generate": "drizzle-kit generate:pg",
-    "db:generate:types": "supabase gen types typescript --local > supabase/functions/_shared/database.types.ts && supabase gen types typescript --local > src/lib/sb/database.types.ts"
+    "db:generate:types": "supabase gen types typescript --local > supabase/functions/_shared/database.types.ts && supabase gen types typescript --local > src/lib/sb/database.types.ts",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/stripe"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -46,6 +47,7 @@
     "react-day-picker": "^8.10.0",
     "react-dom": "^18.2.0",
     "server-only": "^0.0.1",
+    "stripe": "^15.5.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.7.0",

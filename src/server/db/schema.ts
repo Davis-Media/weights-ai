@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -43,6 +44,10 @@ export const userExercise = pgTable("user_exercise", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   profileId: uuid("profile_id").notNull().references(() => profile.id),
+}, (table) => {
+  return {
+    nameIdx: index("name_idx").on(table.name),
+  };
 });
 
 export const userExerciseRelations = relations(

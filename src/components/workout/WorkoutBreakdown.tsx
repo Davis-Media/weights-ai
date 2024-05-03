@@ -11,9 +11,9 @@ import {
   TableRow,
 } from "../ui/table";
 import { Button } from "../ui/button";
-import { useState } from "react";
-import { deleteSet } from "@/server/helper/sets";
+import { useRef, useState } from "react";
 import { Trash } from "lucide-react";
+import { api } from "@/trpc/react";
 
 type WorkoutBreakdownProps = {
   workoutInfo: {
@@ -43,13 +43,21 @@ export function WorkoutBreakdown(props: WorkoutBreakdownProps) {
 
   const [sets, setSets] = useState(workoutInfo.sets);
 
+  const deletedSetIdx = useRef(0);
+
+  const deleteSetMutation = api.sets.deleteSet.useMutation({
+    onSuccess: () => {
+      const copy = sets;
+
+      copy.splice(deletedSetIdx.current, 1);
+
+      setSets([...copy]);
+    },
+  });
+
   const submitDelete = async (id: string, idx: number) => {
-    await deleteSet(id);
-    const copy = sets;
-
-    copy.splice(idx, 1);
-
-    setSets([...copy]);
+    deletedSetIdx.current = idx;
+    deleteSetMutation.mutate({ setId: id });
   };
 
   return (

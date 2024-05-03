@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserMessage } from "@/components/Messages";
 import { CurrentWorkout } from "@/components/workout/CurrentWorkout";
-import { useQuery } from "@tanstack/react-query";
-import { getInProgressWorkout } from "@/server/helper/workout";
+import { api } from "@/trpc/react";
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
@@ -21,15 +20,7 @@ export default function Page() {
     }>;
   };
 
-  const activeWorkoutQuery = useQuery({
-    queryKey: ["active_workout"],
-    queryFn: async () => {
-      const res = await getInProgressWorkout();
-
-      return res ? res : null;
-    },
-    initialData: null,
-  });
+  const activeWorkoutQuery = api.workout.getCurrentWorkout.useQuery();
 
   return (
     <div className="w-full h-screen flex flex-col relative">

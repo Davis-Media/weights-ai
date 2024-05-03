@@ -19,9 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CircleMinus, Copy } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getAllUserExercises } from "@/server/helper/exercise";
-import { saveNewSets } from "@/server/helper/sets";
+import { api } from "@/trpc/react";
 
 export default function AddExerciseCardClient(props: {
   initState: {
@@ -32,13 +30,7 @@ export default function AddExerciseCardClient(props: {
 }) {
   const { initState } = props;
 
-  const allUserExercisesQuery = useQuery({
-    queryKey: ["allUserExercises"],
-    queryFn: async () => {
-      const allUserExercises = await getAllUserExercises();
-      return allUserExercises;
-    },
-  });
+  const allUserExercisesQuery = api.exercise.getAllUserExercises.useQuery({});
 
   const [createState, setCreateState] = useState<
     {
@@ -48,6 +40,12 @@ export default function AddExerciseCardClient(props: {
     }[]
   >(initState);
   const [hasSaved, setHasSaved] = useState(false);
+
+  const saveNewSetsMutation = api.sets.saveNewSets.useMutation({
+    onSuccess: () => {
+      setHasSaved(true);
+    },
+  });
 
   if (!allUserExercisesQuery.data) {
     return <div>LOADING...</div>;
@@ -165,9 +163,7 @@ export default function AddExerciseCardClient(props: {
             e.preventDefault();
 
             if (!hasSaved) {
-              await saveNewSets(createState);
-
-              setHasSaved(true);
+              saveNewSetsMutation.mutate({ sets: createState });
             }
           }}
         >

@@ -4,8 +4,8 @@ import { Button } from "../ui/button";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { setWorkoutInProgress } from "@/server/helper/workout";
 import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
 
 export function ViewWorkoutDetails(props: {
   workout: {
@@ -21,7 +21,24 @@ export function ViewWorkoutDetails(props: {
   const { workout } = props;
   const [_, setMessages] = useUIState<typeof AI>();
 
-  const queryClient = useQueryClient();
+  const utils = api.useUtils();
+
+  const setInprogressMutation = api.workout.setWorkoutInProgress.useMutation({
+    onSuccess: async () => {
+      setMessages([
+        {
+          id: new Date().getMilliseconds(),
+          display: (
+            <SystemMessage
+              needsSep={true}
+              message="Workout set to in progress!"
+            />
+          ),
+        },
+      ]);
+      await utils.workout.invalidate();
+    },
+  });
 
   return (
     <div className="flex flex-row items-center p-4 gap-4" key={workout.id}>
@@ -45,26 +62,8 @@ export function ViewWorkoutDetails(props: {
         <Button
           size="sm"
           disabled={workout.inProgress}
-          onClick={async () => {
-            await setWorkoutInProgress(workout.id);
-            setMessages([
-              {
-                id: new Date().getMilliseconds(),
-                display: (
-                  <SystemMessage
-                    needsSep={true}
-                    message="Selected new workout!"
-                  />
-                ),
-              },
-            ]);
-
-            await queryClient.invalidateQueries({
-              queryKey: ["currentWorkout"],
-            });
-            await queryClient.invalidateQueries({
-              queryKey: ["active_workout"],
-            });
+          onClick={() => {
+            setInprogressMutation.mutate({ workoutId: workout.id });
           }}
         >
           {workout.inProgress ? "In Progress..." : "Start"}

@@ -15,16 +15,12 @@ import { WorkoutBreakdown } from "@/components/workout/WorkoutBreakdown";
 import { Suspense } from "react";
 import { TestRSC } from "@/components/TestRSC";
 import CompleteWorkoutCard from "@/components/workout/CompleteWorkoutCard";
-import {
-  getAllWorkouts,
-  getInProgressWorkout,
-  getWorkoutInfo,
-} from "@/server/helper/workout";
+import { getInProgressWorkout } from "@/server/helper/workout";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
-import { getUserScheduleOneDay } from "@/server/helper/schedule";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { env } from "@/env";
+import { api } from "@/trpc/server";
 
 const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY,
@@ -147,7 +143,9 @@ async function submitUserMessage(userInput: string) {
             );
           }
 
-          const workoutInfo = await getWorkoutInfo(curWorkout.id);
+          const workoutInfo = await api.workout.getWorkoutInfo({
+            workoutId: curWorkout.id,
+          });
           if (!workoutInfo) {
             return (
               <SystemMessage
@@ -284,7 +282,7 @@ async function submitUserMessage(userInput: string) {
             },
           ]);
 
-          const workouts = await getAllWorkouts();
+          const workouts = await api.workout.getAllWorkouts();
 
           return (
             <div>
@@ -385,9 +383,11 @@ async function submitUserMessage(userInput: string) {
             },
           ]);
 
-          const schedule = await getUserScheduleOneDay(new Date().getDay());
+          const schedule = await api.schedule.getUserScheduleOneDay({
+            day: new Date().getDay(),
+          });
 
-          if (!schedule.data) {
+          if (!schedule) {
             return (
               <SystemMessage
                 needsSep={true}
@@ -402,7 +402,7 @@ async function submitUserMessage(userInput: string) {
                 needsSep={false}
                 message="Here is your schedule for today:"
               />
-              <OneDaySchedule entry={schedule.data} />
+              <OneDaySchedule entry={schedule} />
             </div>
           );
         },

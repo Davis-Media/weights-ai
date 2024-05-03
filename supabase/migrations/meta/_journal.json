@@ -15,6 +15,13 @@
       "when": 1714334468227,
       "tag": "0001_solid_the_twelve",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1714774246048,
+      "tag": "0002_large_viper",
+      "breakpoints": true
     }
   ]
 }

@@ -21,12 +21,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { createWorkout } from "@/server/helper/workout";
-import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
 
 export default function CreateWorkoutCard() {
   // TODO: make state cleaner, idc right now
@@ -35,22 +33,25 @@ export default function CreateWorkoutCard() {
   const [date, setDate] = useState(new Date());
   const [inProgress, setInProgress] = useState(false);
   const [_, setMessages] = useUIState<typeof AI>();
-  const queryClient = useQueryClient();
+
+  const utils = api.useUtils();
+
+  const createWorkoutMutation = api.workout.createWorkout.useMutation({
+    onSuccess: () => {
+      setMessages([
+        {
+          id: new Date().getMilliseconds(),
+          display: (
+            <SystemMessage needsSep={true} message="Created new workout!" />
+          ),
+        },
+      ]);
+      utils.workout.invalidate();
+    },
+  });
 
   const submit = async () => {
-    const res = await createWorkout({ name, location, date, inProgress });
-
-    setMessages([
-      {
-        id: new Date().getMilliseconds(),
-        display: (
-          <SystemMessage needsSep={true} message="Created new workout!" />
-        ),
-      },
-    ]);
-    queryClient.invalidateQueries({ queryKey: ["currentWorkout"] });
-
-    console.log("workout created! id:", res.nId);
+    createWorkoutMutation.mutate({ name, location, date, inProgress });
   };
 
   return (

@@ -10,35 +10,16 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp, Edit, Pen, X } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useMemo, useState } from "react";
-import {
-  createUserSchedule,
-  getUserSchedule,
-  getUserScheduleDay,
-  updateUserSchedule,
-} from "@/server/helper/schedule";
-import {
-  createUserExercise,
-  searchForExercise,
-} from "@/server/helper/exercise";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/trpc/react";
 
 export function ManageSchedule() {
-  const userScheduleQuery = useQuery({
-    queryKey: ["user_schedule"],
-    queryFn: async () => {
-      const res = await getUserSchedule();
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      return res.data;
-    },
+  const userScheduleQuery = api.schedule.getUserSchedule.useQuery(undefined, {
+    enabled: true,
     initialData: [],
   });
 
@@ -97,19 +78,13 @@ function EditDay(props: { scheduleId: string }) {
 
   const [dayName, setDayName] = useState("");
 
-  const dayQuery = useQuery({
-    queryKey: ["user_schedule_day", scheduleId],
-    queryFn: async () => {
-      const res = await getUserScheduleDay(scheduleId);
+  const dayQuery = api.schedule.getUserScheduleDay.useQuery({ scheduleId });
 
-      if (!res.data) {
-        throw new Error(res.message);
-      }
-
-      setDayName(res.data.name);
-
+  useEffect(() => {
+    if (dayQuery.data) {
+      setDayName(dayQuery.data.name);
       setSelectedExercises(
-        res.data.userScheduleEntries.map((se) => {
+        dayQuery.data.userScheduleEntries.map((se) => {
           return {
             name: se.userExercise.name,
             id: se.userExercise.id,
@@ -117,11 +92,8 @@ function EditDay(props: { scheduleId: string }) {
           };
         })
       );
-
-      return res.data;
-    },
-    initialData: null,
-  });
+    }
+  }, [dayQuery.data]);
 
   const [selectedExercises, setSelectedExercises] = useState<
     {
@@ -131,17 +103,8 @@ function EditDay(props: { scheduleId: string }) {
     }[]
   >([]);
 
-  const createExerciseMutation = useMutation({
-    mutationKey: ["create_exercise"],
-    mutationFn: async (name: string) => {
-      const res = await createUserExercise(name);
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      setExerciseSearchQuery("");
-
+  const createExerciseMutation = api.exercise.createUserExercise.useMutation({
+    onSuccess: (data) => {
       let maxOrder = 0;
       selectedExercises.forEach((selEx) => {
         if (selEx.order > maxOrder) {
@@ -152,31 +115,27 @@ function EditDay(props: { scheduleId: string }) {
       setSelectedExercises([
         ...selectedExercises,
         {
-          id: res.data,
-          name,
+          id: data.id,
+          name: exerciseSearchQuery,
           order: maxOrder + 1,
         },
       ]);
+
+      setExerciseSearchQuery("");
     },
   });
 
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
 
-  const queryClient = useQueryClient();
-
-  const searchForExerciseQuery = useQuery({
-    queryKey: ["search_for_exercise", exerciseSearchQuery],
-    queryFn: async () => {
-      const res = await searchForExercise(exerciseSearchQuery);
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      return res.data;
+  const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
+    {
+      query: exerciseSearchQuery,
     },
-    initialData: [],
-  });
+    {
+      enabled: exerciseSearchQuery !== "",
+      initialData: [],
+    }
+  );
 
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
@@ -186,25 +145,12 @@ function EditDay(props: { scheduleId: string }) {
     return copy;
   }, [selectedExercises]);
 
-  const updateScheduleMutation = useMutation({
-    mutationKey: ["update_schedule"],
-    mutationFn: async () => {
-      const res = await updateUserSchedule({
-        scheduleId,
-        name: dayName,
-        exercises: selectedExercises.map((selEx) => ({
-          exerciseId: selEx.id,
-          order: selEx.order,
-        })),
-      });
+  const utils = api.useUtils();
 
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
+  const updateScheduleMutation = api.schedule.updateUserSchedule.useMutation({
+    onSuccess: () => {
       setIsOpen(false);
-
-      queryClient.invalidateQueries({ queryKey: ["user_schedule"] });
+      utils.schedule.getUserSchedule.invalidate();
     },
   });
 
@@ -369,7 +315,7 @@ function EditDay(props: { scheduleId: string }) {
                   className="justify-start"
                   disabled={createExerciseMutation.isPending}
                   onClick={() =>
-                    createExerciseMutation.mutate(exerciseSearchQuery)
+                    createExerciseMutation.mutate({ name: exerciseSearchQuery })
                   }
                 >
                   {createExerciseMutation.isPending
@@ -382,7 +328,16 @@ function EditDay(props: { scheduleId: string }) {
         </div>
         <DialogFooter>
           <Button
-            onClick={() => updateScheduleMutation.mutate()}
+            onClick={() =>
+              updateScheduleMutation.mutate({
+                name: dayName,
+                exercises: selectedExercises.map((se) => ({
+                  exerciseId: se.id,
+                  order: se.order,
+                })),
+                scheduleId,
+              })
+            }
             disabled={updateScheduleMutation.isPending}
           >
             {updateScheduleMutation.isPending ? "Saving..." : "Save"}
@@ -410,46 +365,17 @@ function CreateNewDay(props: { takenDays: number[] }) {
 
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
-  const queryClient = useQueryClient();
+  const utils = api.useUtils();
 
-  const createScheduleMutation = useMutation({
-    mutationKey: ["create_schedule"],
-    mutationFn: async () => {
-      console.log(selectedDay);
-      if (selectedDay === null) {
-        throw new Error("no day selected!");
-      }
-
-      const res = await createUserSchedule({
-        name: dayName,
-        day: selectedDay,
-        exercises: selectedExercises.map((selEx) => ({
-          exerciseId: selEx.id,
-          order: selEx.order,
-        })),
-      });
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
+  const createScheduleMutation = api.schedule.createUserSchedule.useMutation({
+    onSuccess: () => {
       setIsOpen(false);
-
-      queryClient.invalidateQueries({ queryKey: ["user_schedule"] });
+      utils.schedule.getUserSchedule.invalidate();
     },
   });
 
-  const createExerciseMutation = useMutation({
-    mutationKey: ["create_exercise"],
-    mutationFn: async (name: string) => {
-      const res = await createUserExercise(name);
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      setExerciseSearchQuery("");
-
+  const createExerciseMutation = api.exercise.createUserExercise.useMutation({
+    onSuccess: (data) => {
       let maxOrder = 0;
       selectedExercises.forEach((selEx) => {
         if (selEx.order > maxOrder) {
@@ -460,29 +386,27 @@ function CreateNewDay(props: { takenDays: number[] }) {
       setSelectedExercises([
         ...selectedExercises,
         {
-          id: res.data,
-          name,
+          id: data.id,
+          name: exerciseSearchQuery,
           order: maxOrder + 1,
         },
       ]);
+
+      setExerciseSearchQuery("");
     },
   });
 
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
 
-  const searchForExerciseQuery = useQuery({
-    queryKey: ["search_for_exercise", exerciseSearchQuery],
-    queryFn: async () => {
-      const res = await searchForExercise(exerciseSearchQuery);
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      return res.data;
+  const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
+    {
+      query: exerciseSearchQuery,
     },
-    initialData: [],
-  });
+    {
+      enabled: exerciseSearchQuery !== "",
+      initialData: [],
+    }
+  );
 
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
@@ -703,7 +627,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
                   className="justify-start"
                   disabled={createExerciseMutation.isPending}
                   onClick={() =>
-                    createExerciseMutation.mutate(exerciseSearchQuery)
+                    createExerciseMutation.mutate({ name: exerciseSearchQuery })
                   }
                 >
                   {createExerciseMutation.isPending
@@ -716,7 +640,20 @@ function CreateNewDay(props: { takenDays: number[] }) {
         </div>
         <DialogFooter>
           <Button
-            onClick={() => createScheduleMutation.mutate()}
+            onClick={() => {
+              if (selectedDay === null) {
+                alert("no day selected!");
+                return;
+              }
+              createScheduleMutation.mutate({
+                name: dayName,
+                exercises: selectedExercises.map((se) => ({
+                  exerciseId: se.id,
+                  order: se.order,
+                })),
+                day: selectedDay,
+              });
+            }}
             disabled={createScheduleMutation.isPending}
           >
             {createScheduleMutation.isPending ? "Saving..." : "Save"}

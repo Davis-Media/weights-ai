@@ -7,12 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "../ui/button";
-import { completeWorkout } from "@/server/helper/workout";
-import { useRouter } from "next/navigation";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
 
 export default function CompleteWorkoutCard({
   workoutId,
@@ -20,27 +18,25 @@ export default function CompleteWorkoutCard({
   workoutId: string;
 }) {
   const [_, setMessages] = useUIState<typeof AI>();
-  const router = useRouter();
 
-  const queryClient = useQueryClient();
+  const utils = api.useUtils();
+
+  const completeWorkoutMutation = api.workout.completeWorkout.useMutation({
+    onSuccess: async () => {
+      setMessages([
+        {
+          id: new Date().getMilliseconds(),
+          display: (
+            <SystemMessage needsSep={true} message="Workout completed!" />
+          ),
+        },
+      ]);
+      await utils.workout.invalidate();
+    },
+  });
 
   const submit = async () => {
-    console.log("Submitting workout");
-
-    await completeWorkout(workoutId);
-
-    setMessages([
-      {
-        id: new Date().getMilliseconds(),
-        display: <SystemMessage needsSep={true} message="Workout completed!" />,
-      },
-    ]);
-    await queryClient.invalidateQueries({
-      queryKey: ["currentWorkout"],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ["active_workout"],
-    });
+    completeWorkoutMutation.mutate({ workoutId });
   };
 
   return (

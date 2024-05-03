@@ -1,22 +1,10 @@
 "use client";
 
-import { getInProgressWorkout } from "@/server/helper/workout";
 import { Card } from "../ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
 
 export function CurrentWorkout() {
-  const curWorkoutQuery = useQuery({
-    queryKey: ["currentWorkout"],
-    queryFn: async () => {
-      const workout = await getInProgressWorkout();
-
-      if (workout) {
-        return workout;
-      }
-      return null;
-    },
-    initialData: null,
-  });
+  const curWorkoutQuery = api.workout.getCurrentWorkout.useQuery();
 
   if (curWorkoutQuery.isLoading) {
     return <div>Loading...</div>;

@@ -18,10 +18,11 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/trpc/react";
 
 export function ManageSchedule() {
-  const userScheduleQuery = api.schedule.getUserSchedule.useQuery(undefined, {
-    enabled: true,
-    initialData: [],
-  });
+  const userScheduleQuery = api.schedule.getUserSchedule.useQuery();
+
+  if (!userScheduleQuery.data) {
+    return <div>LOADING...</div>;
+  }
 
   return (
     <Card>

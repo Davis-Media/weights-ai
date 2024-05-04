@@ -66,8 +66,8 @@ export default function AddExerciseCardClient(props: {
                 value={item.exerciseId}
                 disabled={hasSaved}
                 onValueChange={(v) => {
-                  const copy = createState;
-                  copy[i].exerciseId = v;
+                  const copy = [...createState];
+                  copy[i] = { ...copy[i], exerciseId: v }; // Create a new object with the updated reps value
                   setCreateState([...copy]);
                 }}
               >
@@ -94,10 +94,10 @@ export default function AddExerciseCardClient(props: {
                 type="number"
                 value={item.reps}
                 onChange={(e) => {
-                  const copy = createState;
+                  const copy = [...createState]; // Create a new copy of the array
                   const nValue = parseInt(e.target.value);
-                  copy[i].reps = isNaN(nValue) ? 0 : nValue;
-                  setCreateState([...copy]);
+                  copy[i] = { ...copy[i], reps: isNaN(nValue) ? 0 : nValue }; // Create a new object with the updated reps value
+                  setCreateState(copy);
                 }}
               />
             </div>
@@ -112,10 +112,10 @@ export default function AddExerciseCardClient(props: {
                 type="number"
                 value={item.weight}
                 onChange={(e) => {
-                  const copy = createState;
+                  const copy = [...createState]; // Create a new copy of the array
                   const nValue = parseInt(e.target.value);
-                  copy[i].weight = isNaN(nValue) ? 0 : nValue;
-                  setCreateState([...copy]);
+                  copy[i] = { ...copy[i], weight: isNaN(nValue) ? 0 : nValue }; // Create a new object with the updated reps value
+                  setCreateState(copy);
                 }}
               />
             </div>

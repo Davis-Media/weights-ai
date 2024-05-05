@@ -1,7 +1,11 @@
 {
-  "name": "weights-ai",
-  "version": "0.1.0",
+  "name": "@big-stair/gym-ai",
+  "version": "0.2.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bmdavis419/weights-ai"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

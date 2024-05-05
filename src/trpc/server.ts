@@ -9,8 +9,9 @@ import { createCaller, createTRPCContext } from "@/server";
 const createContext = cache(async () => {
   const heads = new Headers(headers());
   heads.set("x-trpc-source", "rsc");
+  const ip = headers().get("x-forwarded-for");
 
-  return createTRPCContext();
+  return createTRPCContext({ headers: heads, ip: ip ?? "LOCAL" });
 });
 
 export const api = createCaller(createContext);

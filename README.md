@@ -8,6 +8,10 @@ A simple weights tracker application that the user can interact with using text 
 
 Weights AI also allows you to setup a basic weekly schedule for you to follow.
 
+### Hosted version
+
+A hosted version of this app is available for a one time fee.
+
 ### Stack
 
 - NextJS

@@ -23,10 +23,12 @@ export default function ViewAllWorkouts(props: ViewAllWorkoutsProps) {
   const { workouts } = props;
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full ">
       <CardHeader>
         <CardTitle>Workouts</CardTitle>
-        <CardDescription>View your workouts</CardDescription>
+        <CardDescription>
+          View your workouts, tap the workout name for details
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <div className="flex flex-col gap-2 border-t border-gray-200 last:border-0 dark:border-gray-800">

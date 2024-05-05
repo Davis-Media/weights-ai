@@ -60,8 +60,6 @@ export const scheduleRouter = createTRPCRouter({
       },
     });
 
-    console.log(scheduleEntries);
-
     return scheduleEntries.map((se) => {
       return {
         day: se.day,

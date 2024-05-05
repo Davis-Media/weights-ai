@@ -21,10 +21,10 @@ export const NavBar = () => {
     run();
   }, []);
   return (
-    <header className="px-4 lg:px-6 h-14 flex items-center">
-      <Link className="flex items-center justify-center" href="/">
-        <MountainIcon />
-        <span className="sr-only">Acme Inc</span>
+    <header className="px-4 lg:px-6 h-14 flex items-center md:py-2">
+      <Link className="flex justify-center flex-col" href="/">
+        <h1 className="text-xl font-bold">Gym AI</h1>
+        <p className="text-sm font-light text-gray-400">A Big Stair Product</p>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6">
         {/* <Link

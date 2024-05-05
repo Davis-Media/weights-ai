@@ -1,10 +1,42 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "../db";
-import { workout } from "../db/schema";
+import { set, workout } from "../db/schema";
 import { authProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const workoutRouter = createTRPCRouter({
+  deleteWorkout: authProcedure.input(z.object({ workoutId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const curWorkout = await db.query.workout.findFirst({
+        where: and(
+          eq(workout.id, input.workoutId),
+          eq(workout.profileId, ctx.profile.id),
+        ),
+      });
+      if (!curWorkout) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Workout not found",
+        });
+      }
+      // delete the set
+      await db.delete(set).where(
+        and(
+          eq(set.workoutId, input.workoutId),
+        ),
+      );
+      await db
+        .delete(workout)
+        .where(
+          and(
+            eq(workout.id, input.workoutId),
+            eq(workout.profileId, ctx.profile.id),
+          ),
+        );
+
+      return { success: true };
+    }),
   getCurrentWorkout: authProcedure.query(async ({ ctx }) => {
     const curWorkout = await db.query.workout.findFirst({
       where: and(

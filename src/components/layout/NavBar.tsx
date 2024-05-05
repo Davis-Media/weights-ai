@@ -34,6 +34,12 @@ export const NavBar = () => {
           Contact
         </Link> */}
 
+        <Link
+          className="text-sm font-medium hover:underline underline-offset-4"
+          href="/support"
+        >
+          Support
+        </Link>
         {user ? (
           <>
             <Link

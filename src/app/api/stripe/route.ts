@@ -1,4 +1,7 @@
+import { db } from "@/server/db";
+import { profile } from "@/server/db/schema";
 import { stripe } from "@/server/stripe";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { Stripe } from "stripe";
 
@@ -26,8 +29,29 @@ export async function POST(req: Request) {
 
   switch (event.type) {
     case "checkout.session.completed":
-      const session = event.data.object as Stripe.Checkout.Session;
-      // Handle successful checkout session
+      const sessionWithCustomer = await stripe.checkout.sessions.retrieve(
+        event.data.object.id,
+        {
+          expand: ["customer"],
+        },
+      );
+
+      if (sessionWithCustomer.metadata) {
+        const profileId = sessionWithCustomer.metadata.profileId as string;
+
+        const customer = sessionWithCustomer.customer as Stripe.Customer | null;
+        if (customer) {
+          // add customer to user
+          await db
+            .update(profile)
+            .set({
+              stripeCustomerId: customer.id,
+              proPaymentId: sessionWithCustomer.id,
+              role: "pro",
+            })
+            .where(eq(profile.id, profileId));
+        }
+      }
       break;
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object as Stripe.PaymentIntent;

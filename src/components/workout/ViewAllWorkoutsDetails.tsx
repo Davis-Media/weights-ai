@@ -4,8 +4,16 @@ import { Button } from "../ui/button";
 import { useUIState } from "ai/rsc";
 import { AI } from "@/app/action";
 import { SystemMessage } from "../Messages";
-import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/trpc/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function ViewWorkoutDetails(props: {
   workout: {
@@ -40,6 +48,18 @@ export function ViewWorkoutDetails(props: {
     },
   });
 
+  const deleteMutation = api.workout.deleteWorkout.useMutation({
+    onSuccess: async () => {
+      setMessages([
+        {
+          id: new Date().getMilliseconds(),
+          display: <SystemMessage needsSep={true} message="Workout deleted!" />,
+        },
+      ]);
+      await utils.workout.invalidate();
+    },
+  });
+
   return (
     <div className="flex flex-row items-center p-4 gap-4" key={workout.id}>
       <div className="flex items-center gap-4">
@@ -59,6 +79,33 @@ export function ViewWorkoutDetails(props: {
             workout.inProgress ? "bg-green-500" : "bg-red-500"
           }`}
         />
+        <Dialog>
+          <DialogTrigger
+            disabled={workout.inProgress || deleteMutation.isPending}
+          >
+            Delete Workout
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your
+                workout and remove your data from our servers.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  deleteMutation.mutate({ workoutId: workout.id });
+                }}
+                disabled={deleteMutation.isPending}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Button
           size="sm"
           disabled={workout.inProgress}

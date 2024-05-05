@@ -1,12 +1,8 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { api } from "@/trpc/react";
 
 export default function Component() {
-  const testQuery = api.hello.useQuery({ text: "test" });
-
-  console.log(testQuery.data);
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <main className="flex-1">
@@ -19,8 +15,9 @@ export default function Component() {
                     Weights AI
                   </h1>
                   <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                    The easiest way to track your progress. Enter your weight
-                    and let the AI do the rest.
+                    Track your weights with an AI assistant. Create your
+                    schedule, create your workout, and tell the AI what you are
+                    doing.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">

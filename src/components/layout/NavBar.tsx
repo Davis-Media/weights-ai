@@ -38,7 +38,7 @@ export const NavBar = () => {
           className="text-sm font-medium hover:underline underline-offset-4"
           href="/support"
         >
-          Support
+          Support & Feedback
         </Link>
         {user ? (
           <>

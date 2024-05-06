@@ -5,6 +5,7 @@ import { scheduleRouter } from "./schedule";
 import { setsRouter } from "./sets";
 import { workoutRouter } from "./workout";
 import { userRouter } from "./user";
+import { feedbackRouter } from "./feedback";
 
 export const appRouter = createTRPCRouter({
   workout: workoutRouter,
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   exercise: exerciseRouter,
   schedule: scheduleRouter,
   user: userRouter,
+  feedback: feedbackRouter,
   hello: publicProcedure
     .input(
       z.object({

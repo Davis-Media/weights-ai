@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authProcedure, createTRPCRouter } from "../trpc";
 import { db } from "../db";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { userSchedule, userScheduleEntry } from "../db/schema";
 
 export const scheduleRouter = createTRPCRouter({
@@ -46,6 +46,7 @@ export const scheduleRouter = createTRPCRouter({
   getUserSchedule: authProcedure.query(async ({ ctx }) => {
     const scheduleEntries = await db.query.userSchedule.findMany({
       where: eq(userSchedule.profileId, ctx.profile.id),
+      orderBy: asc(userSchedule.day),
       columns: {
         day: true,
         id: true,

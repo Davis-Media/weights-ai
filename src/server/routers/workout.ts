@@ -46,7 +46,7 @@ export const workoutRouter = createTRPCRouter({
       ),
     });
 
-    return curWorkout;
+    return curWorkout || null;
   }),
   completeWorkout: authProcedure.input(z.object({ workoutId: z.string() }))
     .mutation(async ({ input }) => {

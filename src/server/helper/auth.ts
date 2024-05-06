@@ -4,6 +4,7 @@ import { createClient } from "@/server/sb/server";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { profile } from "../db/schema";
+import { trackProjectPlannerEvent } from "./events";
 
 export const getIsUserPro = async () => {
   const { profile } = await getOrCreateProfile();
@@ -59,6 +60,9 @@ export const getOrCreateProfile = async () => {
     firstName,
     lastName,
   });
+
+  // track user creation
+  await trackProjectPlannerEvent("user_profile_created");
 
   const curProfile2 = await db.query.profile.findFirst({
     where: eq(profile.id, user.id),

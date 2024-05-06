@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
 import { profile } from "@/server/db/schema";
+import { trackProjectPlannerEvent } from "@/server/helper/events";
 import { stripe } from "@/server/stripe";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -50,6 +51,8 @@ export async function POST(req: Request) {
               role: "pro",
             })
             .where(eq(profile.id, profileId));
+
+          await trackProjectPlannerEvent("pro_user_created");
         }
       }
       break;

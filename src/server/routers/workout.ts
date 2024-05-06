@@ -4,6 +4,7 @@ import { set, workout } from "../db/schema";
 import { authProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { trackProjectPlannerEvent } from "../helper/events";
 
 export const workoutRouter = createTRPCRouter({
   deleteWorkout: authProcedure.input(z.object({ workoutId: z.string() }))
@@ -48,13 +49,15 @@ export const workoutRouter = createTRPCRouter({
     return curWorkout;
   }),
   completeWorkout: authProcedure.input(z.object({ workoutId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       await db
         .update(workout)
         .set({
           inProgress: false,
         })
         .where(eq(workout.id, input.workoutId));
+
+      await trackProjectPlannerEvent("completed_workout");
 
       return { success: true };
     }),
@@ -93,6 +96,8 @@ export const workoutRouter = createTRPCRouter({
       ...input,
       profileId: ctx.profile.id,
     }).returning({ insertedId: workout.id });
+
+    await trackProjectPlannerEvent("created_workout");
 
     if (input.inProgress) {
       await db

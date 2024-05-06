@@ -10,6 +10,8 @@ export const env = createEnv({
     STRIPE_PRICE_ID: z.string().min(1),
     UPSTASH_REDIS_URL: z.string().url(),
     UPSTASH_REDIS_TOKEN: z.string().min(1),
+    NODE_ENV: z.enum(["development", "test", "production"]),
+    PROJECT_PLANNER_PROJECT_ID: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
@@ -18,7 +20,9 @@ export const env = createEnv({
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
+    PROJECT_PLANNER_PROJECT_ID: process.env.PROJECT_PLANNER_PROJECT_ID,
     DATABASE_URL: process.env.DATABASE_URL,
+    NODE_ENV: process.env.NODE_ENV,
     UPSTASH_REDIS_TOKEN: process.env.UPSTASH_REDIS_TOKEN,
     UPSTASH_REDIS_URL: process.env.UPSTASH_REDIS_URL,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,

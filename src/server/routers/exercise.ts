@@ -7,7 +7,7 @@ import { env } from "@/env";
 
 export const exerciseRouter = createTRPCRouter({
   getAllUserExercises: authProcedure.input(z.object({
-    take: z.number().default(10),
+    take: z.number().default(100),
     skip: z.number().default(0),
   })).query(async ({ ctx, input }) => {
     const userExercises = await db.query.userExercise.findMany({

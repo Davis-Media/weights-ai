@@ -128,10 +128,6 @@ function EditDay(props: { scheduleId: string }) {
 
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
 
-  useEffect(() => {
-    console.log(exerciseSearchQuery);
-  }, [exerciseSearchQuery]);
-
   const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
     {
       query: exerciseSearchQuery,

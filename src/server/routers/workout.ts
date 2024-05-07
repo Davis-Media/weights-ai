@@ -7,6 +7,89 @@ import { TRPCError } from "@trpc/server";
 import { trackProjectPlannerEvent } from "../helper/events";
 
 export const workoutRouter = createTRPCRouter({
+  getFullWorkoutDetails: authProcedure.input(
+    z.object({ workoutId: z.string() }),
+  ).query(async ({ ctx, input }) => {
+    const curWorkout = await db.query.workout.findFirst({
+      where: and(
+        eq(workout.id, input.workoutId),
+        eq(workout.profileId, ctx.profile.id),
+      ),
+      with: {
+        sets: {
+          with: {
+            userExercise: true,
+          },
+        },
+      },
+    });
+
+    if (!curWorkout) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Workout not found",
+      });
+    }
+
+    // collapse the sets into a nicer format
+    const exercises: {
+      name: string;
+      keySetInfo: string; // ex. 225 x 5 x 5
+      sets: {
+        weight: number;
+        reps: number;
+      }[];
+    }[] = [];
+
+    for (let i = 0; i < curWorkout.sets.length; i++) {
+      const set = curWorkout.sets[i];
+      const userExercise = set.userExercise;
+
+      const curExercise = exercises.findIndex((e) =>
+        e.name === userExercise.name
+      );
+
+      if (curExercise === -1) {
+        exercises.push({
+          name: userExercise.name,
+          keySetInfo: `${set.weight} x ${set.reps} x 1`,
+          sets: [{
+            weight: set.weight,
+            reps: set.reps,
+          }],
+        });
+      } else {
+        exercises[curExercise].sets.push({
+          weight: set.weight,
+          reps: set.reps,
+        });
+
+        // update the keySetInfo
+        let topWeight = 0;
+        let topReps = 0;
+        let topCount = 0;
+        for (let j = 0; j < exercises[curExercise].sets.length; j++) {
+          if (exercises[curExercise].sets[j].weight > topWeight) {
+            topWeight = exercises[curExercise].sets[j].weight;
+            topReps = exercises[curExercise].sets[j].reps;
+            topCount = 1;
+          } else if (exercises[curExercise].sets[j].weight === topWeight) {
+            topCount++;
+          }
+        }
+
+        exercises[curExercise].keySetInfo =
+          `${topWeight} x ${topReps} x ${topCount}`;
+      }
+    }
+
+    return {
+      workoutName: curWorkout.name,
+      date: curWorkout.date,
+      location: curWorkout.location,
+      exercises,
+    };
+  }),
   deleteWorkout: authProcedure.input(z.object({ workoutId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const curWorkout = await db.query.workout.findFirst({

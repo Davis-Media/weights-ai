@@ -9,8 +9,25 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
+import { api } from "@/trpc/react";
 
 export default function WorkoutPage() {
+  const workoutDetailsQuery = api.workout.getFullWorkoutDetails.useQuery({
+    workoutId: "e42b1a47-1c01-499a-b5c3-f1a9ea88ed98",
+  });
+
+  if (workoutDetailsQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (workoutDetailsQuery.isError) {
+    return <div>Error: {workoutDetailsQuery.error.message}</div>;
+  }
+
+  if (!workoutDetailsQuery.data) {
+    return <div>No workout found</div>;
+  }
+
   return (
     <div key="1" className="flex flex-col">
       <div className="mt-4 mx-4 flex items-center justify-between">
@@ -18,9 +35,10 @@ export default function WorkoutPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>
-                Leg Day
+                {workoutDetailsQuery.data.workoutName}
                 <div className="text-sm font-medium text-gray-500 mt-1">
-                  RPAC - 4/20/2024
+                  {workoutDetailsQuery.data.location} -{" "}
+                  {workoutDetailsQuery.data.date.toLocaleDateString()}
                 </div>
               </CardTitle>
               <Button
@@ -32,70 +50,36 @@ export default function WorkoutPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Collapsible className="space-y-3">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span>Squats</span>
-                  <div className="flex items-center">
-                    <span className="mr-2">420 x 3 x 12</span>
-                    <CollapsibleTrigger asChild>
-                      <Button className="ml-auto" size="icon" variant="ghost">
-                        <ChevronDownIcon />
-                      </Button>
-                    </CollapsibleTrigger>
+            {workoutDetailsQuery.data.exercises.map((e) => (
+              <Collapsible className="space-y-3" key={e.name}>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span>{e.name}</span>
+                    <div className="flex items-center">
+                      <span className="mr-2">{e.keySetInfo}</span>
+                      <CollapsibleTrigger asChild>
+                        <Button className="ml-auto" size="icon" variant="ghost">
+                          <ChevronDownIcon />
+                        </Button>
+                      </CollapsibleTrigger>
+                    </div>
                   </div>
+                  <Separator className="my-2" />
+                  <CollapsibleContent>
+                    <ul className="space-y-2">
+                      {e.sets.map((s, idx) => (
+                        <li className="flex justify-between" key={idx}>
+                          <span>Set {idx + 1}</span>
+                          <span>
+                            {s.weight} x {s.reps}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CollapsibleContent>
                 </div>
-                <Separator className="my-2" />
-                <CollapsibleContent>
-                  <ul className="space-y-2">
-                    <li className="flex justify-between">
-                      <span>Set 1</span>
-                      <span>420 lbs x 12 reps</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Set 2</span>
-                      <span>420 lbs x 12 reps</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Set 3</span>
-                      <span>420 lbs x 12 reps</span>
-                    </li>
-                  </ul>
-                </CollapsibleContent>
-              </div>
-            </Collapsible>
-            <Collapsible className="space-y-3">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span>Leg Press</span>
-                  <div className="flex items-center">
-                    <span className="mr-2">600 x 3 x 10</span>
-                    <CollapsibleTrigger asChild>
-                      <Button className="ml-auto" size="icon" variant="ghost">
-                        <ChevronDownIcon />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
-                <Separator className="my-2" />
-                <CollapsibleContent>
-                  <ul className="space-y-2">
-                    <li className="flex justify-between">
-                      <span>Set 1</span>
-                      <span>600 lbs x 10 reps</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Set 2</span>
-                      <span>600 lbs x 10 reps</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Set 3</span>
-                      <span>600 lbs x 10 reps</span>
-                    </li>
-                  </ul>
-                </CollapsibleContent>
-              </div>
-            </Collapsible>
+              </Collapsible>
+            ))}
           </CardContent>
         </Card>
       </div>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NavBar } from "@/components/layout/NavBar";
 import "./globals.css";
 import { AI } from "./action";
@@ -7,8 +7,14 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
 export const metadata: Metadata = {
-  title: "Weights AI",
-  description: "A basic GPT wrapper, built to show off Gen AI UI",
+  title: "Matterhorn AI",
+  description: "Track your progress with the simplest AI weights tracker",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

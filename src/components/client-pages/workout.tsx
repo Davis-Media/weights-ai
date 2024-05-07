@@ -11,9 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import { api } from "@/trpc/react";
 
-export default function WorkoutPage() {
+type WorkoutPageProps = {
+  workoutId: string;
+};
+
+export default function WorkoutPage(props: WorkoutPageProps) {
+  const { workoutId } = props;
   const workoutDetailsQuery = api.workout.getFullWorkoutDetails.useQuery({
-    workoutId: "e42b1a47-1c01-499a-b5c3-f1a9ea88ed98",
+    workoutId,
   });
 
   if (workoutDetailsQuery.isLoading) {

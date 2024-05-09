@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "../db";
-import { set, workout } from "../db/schema";
+import { set, userSchedule, workout } from "../db/schema";
 import { authProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -38,6 +38,7 @@ export const workoutRouter = createTRPCRouter({
       sets: {
         weight: number;
         reps: number;
+        id: string;
       }[];
     }[] = [];
 
@@ -56,12 +57,14 @@ export const workoutRouter = createTRPCRouter({
           sets: [{
             weight: set.weight,
             reps: set.reps,
+            id: set.id,
           }],
         });
       } else {
         exercises[curExercise].sets.push({
           weight: set.weight,
           reps: set.reps,
+          id: set.id,
         });
 
         // update the keySetInfo
@@ -83,11 +86,28 @@ export const workoutRouter = createTRPCRouter({
       }
     }
 
+    // get today's schedule
+    const today = new Date();
+    const schedule = await db.query.userSchedule.findFirst({
+      where: and(
+        eq(userSchedule.profileId, ctx.profile.id),
+        eq(userSchedule.day, today.getDay()),
+      ),
+      with: {
+        userScheduleEntries: {
+          with: {
+            userExercise: true,
+          },
+        },
+      },
+    });
+
     return {
       workoutName: curWorkout.name,
       date: curWorkout.date,
       location: curWorkout.location,
       exercises,
+      schedule: schedule ?? null,
     };
   }),
   deleteWorkout: authProcedure.input(z.object({ workoutId: z.string() }))

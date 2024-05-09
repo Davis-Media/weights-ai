@@ -388,23 +388,22 @@ function CreateNewDay(props: { takenDays: number[] }) {
         ...selectedExercises,
         {
           id: data.id,
-          name: exerciseSearchQuery,
+          name: exerciseSearchQuery.query,
           order: maxOrder + 1,
         },
       ]);
 
-      setExerciseSearchQuery("");
+      setExerciseSearchQuery({ query: "" });
     },
   });
 
-  const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState({ query: "" });
 
   const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
+    exerciseSearchQuery,
     {
-      query: exerciseSearchQuery,
-    },
-    {
-      enabled: exerciseSearchQuery !== "",
+      enabled: exerciseSearchQuery.query !== "",
+
       initialData: [],
     }
   );
@@ -582,12 +581,12 @@ function CreateNewDay(props: { takenDays: number[] }) {
             <Input
               placeholder="Bench"
               onChange={(e) => {
-                setExerciseSearchQuery(e.target.value);
+                setExerciseSearchQuery({ query: e.target.value });
               }}
-              value={exerciseSearchQuery}
+              value={exerciseSearchQuery.query}
             ></Input>
 
-            {exerciseSearchQuery !== "" && (
+            {exerciseSearchQuery.query !== "" && (
               <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
                 {searchForExerciseQuery.data
                   .filter(
@@ -608,7 +607,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
                               maxOrder = selEx.order;
                             }
                           });
-                          setExerciseSearchQuery("");
+                          setExerciseSearchQuery({ query: "" });
                           setSelectedExercises([
                             ...selectedExercises,
                             {
@@ -628,12 +627,14 @@ function CreateNewDay(props: { takenDays: number[] }) {
                   className="justify-start"
                   disabled={createExerciseMutation.isPending}
                   onClick={() =>
-                    createExerciseMutation.mutate({ name: exerciseSearchQuery })
+                    createExerciseMutation.mutate({
+                      name: exerciseSearchQuery.query,
+                    })
                   }
                 >
                   {createExerciseMutation.isPending
                     ? "Creating..."
-                    : `CREATE: ${exerciseSearchQuery}`}
+                    : `CREATE: ${exerciseSearchQuery.query}`}
                 </Button>
               </div>
             )}

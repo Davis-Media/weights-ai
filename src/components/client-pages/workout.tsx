@@ -1,5 +1,11 @@
 "use client";
-import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
+import {
+  CardTitle,
+  CardHeader,
+  CardContent,
+  Card,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   CollapsibleTrigger,
@@ -8,7 +14,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { CopyCheck, Send, Trash } from "lucide-react";
 import { api } from "@/trpc/react";
 
 type WorkoutPageProps = {
@@ -19,6 +25,20 @@ export default function WorkoutPage(props: WorkoutPageProps) {
   const { workoutId } = props;
   const workoutDetailsQuery = api.workout.getFullWorkoutDetails.useQuery({
     workoutId,
+  });
+
+  const utils = api.useUtils();
+
+  const duplicateSetMutation = api.sets.duplicateSet.useMutation({
+    onSuccess: () => {
+      utils.workout.getFullWorkoutDetails.invalidate();
+    },
+  });
+
+  const deleteSetMutation = api.sets.deleteSet.useMutation({
+    onSuccess: () => {
+      utils.workout.getFullWorkoutDetails.invalidate();
+    },
   });
 
   if (workoutDetailsQuery.isLoading) {
@@ -73,11 +93,33 @@ export default function WorkoutPage(props: WorkoutPageProps) {
                   <CollapsibleContent>
                     <ul className="space-y-2">
                       {e.sets.map((s, idx) => (
-                        <li className="flex justify-between" key={idx}>
+                        <li className="flex justify-between gap-1" key={idx}>
                           <span>Set {idx + 1}</span>
-                          <span>
-                            {s.weight} x {s.reps}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size={"icon"}
+                              disabled={duplicateSetMutation.isPending}
+                              className="bg-green-600"
+                              onClick={() =>
+                                duplicateSetMutation.mutate({ setId: s.id })
+                              }
+                            >
+                              <CopyCheck className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              size={"icon"}
+                              disabled={deleteSetMutation.isPending}
+                              className="bg-red-600"
+                              onClick={() =>
+                                deleteSetMutation.mutate({ setId: s.id })
+                              }
+                            >
+                              <Trash className="w-3 h-3" />
+                            </Button>
+                            <span>
+                              {s.weight} x {s.reps}
+                            </span>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -86,6 +128,29 @@ export default function WorkoutPage(props: WorkoutPageProps) {
               </Collapsible>
             ))}
           </CardContent>
+          <CardFooter>
+            {workoutDetailsQuery.data.schedule ? (
+              <div>
+                <h3>Remaining Exercises for Today:</h3>
+
+                <div>
+                  {workoutDetailsQuery.data.schedule.userScheduleEntries.map(
+                    (se) => {
+                      return (
+                        <div key={se.id}>
+                          <h3 className="text-slate-900 font-bold">
+                            {se.userExercise.name}
+                          </h3>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+            ) : (
+              <h3>No schedule found for today, have fun!</h3>
+            )}
+          </CardFooter>
         </Card>
       </div>
       <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full px-4">

@@ -7,6 +7,50 @@ import { TRPCError } from "@trpc/server";
 import { getInProgressWorkout } from "../helper/workout";
 
 export const setsRouter = createTRPCRouter({
+  duplicateSet: authProcedure.input(z.object({ setId: z.string() })).mutation(
+    async ({ ctx, input }) => {
+      // ensure that the set belongs to the user
+      const curSet = await db.query.set.findFirst({
+        where: eq(set.id, input.setId),
+        columns: {
+          weight: true,
+          reps: true,
+          userExerciseId: true,
+          workoutId: true,
+        },
+        with: {
+          workout: {
+            columns: {
+              profileId: true,
+            },
+          },
+        },
+      });
+
+      if (!curSet) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Set not found",
+        });
+      }
+
+      if (curSet.workout.profileId !== ctx.profile.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to delete this set",
+        });
+      }
+
+      const duplicatedSet = await db.insert(set).values({
+        weight: curSet.weight,
+        reps: curSet.reps,
+        userExerciseId: curSet.userExerciseId,
+        workoutId: curSet.workoutId,
+      }).returning({ insertedId: set.id });
+
+      return { id: duplicatedSet[0].insertedId };
+    },
+  ),
   deleteSet: authProcedure.input(z.object({ setId: z.string() })).mutation(
     async ({ ctx, input }) => {
       // ensure that the set belongs to the user

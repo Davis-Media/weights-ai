@@ -115,4 +115,4 @@ const rateLimiter = t.middleware(async ({ next, ctx }) => {
  */
 export const publicProcedure = t.procedure.use(rateLimiter);
 
-export const authProcedure = t.procedure.use(isAuthed);
+export const authProcedure = publicProcedure.use(isAuthed);

@@ -34,10 +34,6 @@ export const exerciseRouter = createTRPCRouter({
       async ({ input, ctx }) => {
         const { query } = input;
 
-        console.log(query);
-
-        //asdf
-
         // search using the edge function
         const supabaseURL = env.NEXT_PUBLIC_SUPABASE_URL;
         const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -55,6 +51,8 @@ export const exerciseRouter = createTRPCRouter({
             }),
           },
         );
+
+        console.log(res);
 
         const data = (await res.json()) as {
           search: string;

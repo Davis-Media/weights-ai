@@ -13,7 +13,7 @@ import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { env } from "@/env";
 import { api } from "@/trpc/server";
-import { groq, openai } from "@/server/ai";
+import { openai } from "@/server/ai";
 
 async function submitUserMessage(userInput: string) {
   "use server";

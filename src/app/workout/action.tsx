@@ -22,8 +22,11 @@ const sendWorkoutMessage = async (
 
   const history = getMutableAIState<typeof WorkoutAI>();
 
+  // const model = groq("llama3-8b-8192");
+  const model = openai("gpt-3.5-turbo");
+
   const result = await streamUI({
-    model: openai("gpt-3.5-turbo"),
+    model,
     messages: [...history.get(), { role: "user", content: message }],
     text: ({ content, done }) => {
       if (done) {

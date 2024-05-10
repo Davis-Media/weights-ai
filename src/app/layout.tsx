@@ -27,11 +27,12 @@ export default function RootLayout({
       <AI>
         <TRPCReactProvider>
           <body
-            className={`${GeistMono.variable} ${GeistSans.variable} font-geistSans`}
+            className={`${GeistMono.variable} ${GeistSans.variable} font-geistSans w-full min-h-screen flex flex-col justify-between`}
           >
             <NavBar />
             {/* scuffed as all hell, but whatever */}
             {children}
+            <footer>this is a footer</footer>
           </body>
         </TRPCReactProvider>
       </AI>

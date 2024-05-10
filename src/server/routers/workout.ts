@@ -53,7 +53,7 @@ export const workoutRouter = createTRPCRouter({
       if (curExercise === -1) {
         exercises.push({
           name: userExercise.name,
-          keySetInfo: `${set.weight} x ${set.reps} x 1`,
+          keySetInfo: `${set.weight} x 1 x ${set.reps} `,
           sets: [{
             weight: set.weight,
             reps: set.reps,
@@ -82,7 +82,7 @@ export const workoutRouter = createTRPCRouter({
         }
 
         exercises[curExercise].keySetInfo =
-          `${topWeight} x ${topReps} x ${topCount}`;
+          `${topWeight} x ${topCount} x ${topReps}`;
       }
     }
 

@@ -18,7 +18,7 @@ import { CopyCheck, Send, Trash } from "lucide-react";
 import { api } from "@/trpc/react";
 import { useActions, useUIState } from "ai/rsc";
 import { useState } from "react";
-import { WorkoutAI, WorkoutClientMessage } from "@/app/workout/action";
+import { WorkoutAI } from "@/app/workout/action";
 import { nanoid } from "nanoid";
 
 type WorkoutPageProps = {
@@ -64,115 +64,116 @@ export default function WorkoutPage(props: WorkoutPageProps) {
   }
 
   return (
-    <div key="1" className="flex flex-col">
-      <div className="mt-4 mx-4 flex items-center justify-between">
-        <Card className="flex-1">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>
-                {workoutDetailsQuery.data.workoutName}
-                <div className="text-sm font-medium text-gray-500 mt-1">
-                  {workoutDetailsQuery.data.location} -{" "}
-                  {workoutDetailsQuery.data.date.toLocaleDateString()}
-                </div>
-              </CardTitle>
-              <Button
-                className="text-sm font-bold px-6 py-3 bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors"
-                variant="secondary"
-              >
-                Finish
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {workoutDetailsQuery.data.exercises.map((e) => (
-              <Collapsible className="space-y-3" key={e.name}>
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span>{e.name}</span>
-                    <div className="flex items-center">
-                      <span className="mr-2">{e.keySetInfo}</span>
-                      <CollapsibleTrigger asChild>
-                        <Button className="ml-auto" size="icon" variant="ghost">
-                          <ChevronDownIcon />
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
-                  </div>
-                  <Separator className="my-2" />
-                  <CollapsibleContent>
-                    <ul className="space-y-2">
-                      {e.sets.map((s, idx) => (
-                        <li className="flex justify-between gap-1" key={idx}>
-                          <span>Set {idx + 1}</span>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size={"icon"}
-                              disabled={duplicateSetMutation.isPending}
-                              className="bg-green-600"
-                              onClick={() =>
-                                duplicateSetMutation.mutate({ setId: s.id })
-                              }
-                            >
-                              <CopyCheck className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size={"icon"}
-                              disabled={deleteSetMutation.isPending}
-                              className="bg-red-600"
-                              onClick={() =>
-                                deleteSetMutation.mutate({ setId: s.id })
-                              }
-                            >
-                              <Trash className="w-3 h-3" />
-                            </Button>
-                            <span>
-                              {s.weight} x {s.reps}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </CollapsibleContent>
-                </div>
-              </Collapsible>
-            ))}
-          </CardContent>
-          <CardFooter>
-            {workoutDetailsQuery.data.schedule ? (
-              <div>
-                <h3>Remaining Exercises for Today:</h3>
-
-                <div>
-                  {workoutDetailsQuery.data.schedule.userScheduleEntries.map(
-                    (se) => {
-                      return (
-                        <div key={se.id}>
-                          <h3 className="text-slate-900 font-bold">
-                            {se.userExercise.name}
-                          </h3>
-                        </div>
-                      );
-                    }
-                  )}
-                </div>
+    <div
+      key="1"
+      className="grid grid-rows-12 grid-cols-1 md:w-[700px] w-full px-4 md:px-0 justify-between grow  max-h-screen"
+    >
+      <Card className="w-full row-span-3 overflow-scroll no-scrollbar">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              {workoutDetailsQuery.data.workoutName}
+              <div className="text-sm font-medium text-gray-500 mt-1">
+                {workoutDetailsQuery.data.location} -{" "}
+                {workoutDetailsQuery.data.date.toLocaleDateString()}
               </div>
-            ) : (
-              <h3>No schedule found for today, have fun!</h3>
-            )}
-          </CardFooter>
-        </Card>
-      </div>
-      <div>
+            </CardTitle>
+            <Button
+              className="text-sm font-bold px-6 py-3 bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors"
+              variant="secondary"
+            >
+              Finish
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {workoutDetailsQuery.data.exercises.map((e) => (
+            <Collapsible className="space-y-3" key={e.name}>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span>{e.name}</span>
+                  <div className="flex items-center">
+                    <span className="mr-2">{e.keySetInfo}</span>
+                    <CollapsibleTrigger asChild>
+                      <Button className="ml-auto" size="icon" variant="ghost">
+                        <ChevronDownIcon />
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                </div>
+                <Separator className="my-2" />
+                <CollapsibleContent>
+                  <ul className="space-y-2">
+                    {e.sets.map((s, idx) => (
+                      <li className="flex justify-between gap-1" key={idx}>
+                        <span>Set {idx + 1}</span>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size={"icon"}
+                            disabled={duplicateSetMutation.isPending}
+                            className="bg-green-600"
+                            onClick={() =>
+                              duplicateSetMutation.mutate({ setId: s.id })
+                            }
+                          >
+                            <CopyCheck className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size={"icon"}
+                            disabled={deleteSetMutation.isPending}
+                            className="bg-red-600"
+                            onClick={() =>
+                              deleteSetMutation.mutate({ setId: s.id })
+                            }
+                          >
+                            <Trash className="w-3 h-3" />
+                          </Button>
+                          <span>
+                            {s.weight} x {s.reps}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          ))}
+        </CardContent>
+        <CardFooter>
+          {workoutDetailsQuery.data.schedule ? (
+            <div>
+              <h3>Remaining Exercises for Today:</h3>
+
+              <div>
+                {workoutDetailsQuery.data.schedule.userScheduleEntries.map(
+                  (se) => {
+                    return (
+                      <div key={se.id}>
+                        <h3 className="text-slate-900 font-bold">
+                          {se.userExercise.name}
+                        </h3>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          ) : (
+            <h3>No schedule found for today, have fun!</h3>
+          )}
+        </CardFooter>
+      </Card>
+      <div className="flex flex-col gap-4 justify-start p-4 overflow-scroll row-span-7 no-scrollbar">
         {conversation.map((message) => (
           <div key={message.id}>
             {message.role}: {message.display}
           </div>
         ))}
       </div>
-      <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full px-4">
+      <div className="w-full row-span-2 flex items-start justify-center py-4">
         <form
-          className=" bg-black py-2 px-6 rounded-full flex flex-row gap-4 "
+          className=" bg-black py-2 px-6 rounded-full flex flex-row gap-4 w-full"
           onSubmit={async (e) => {
             e.preventDefault();
             setIsLoading(true);
@@ -189,6 +190,11 @@ export default function WorkoutPage(props: WorkoutPageProps) {
               ...currentConversation,
               message,
             ]);
+
+            // this is kinda inelegant, but should work MOST of the time
+            setTimeout(() => {
+              utils.workout.getFullWorkoutDetails.invalidate();
+            }, 2000);
 
             setIsLoading(false);
             setInput("");

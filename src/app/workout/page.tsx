@@ -11,7 +11,7 @@ export default async function Page() {
 
   return (
     <WorkoutAI>
-      <div>
+      <div className="w-full flex flex-col items-center h-full  grow">
         <WorkoutPage workoutId={currentWorkout.id} />
       </div>
     </WorkoutAI>

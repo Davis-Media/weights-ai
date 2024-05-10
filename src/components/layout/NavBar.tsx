@@ -23,8 +23,8 @@ export const NavBar = () => {
   return (
     <header className="px-4 lg:px-6 h-14 flex items-center md:py-2">
       <Link className="flex justify-center flex-col" href="/">
-        <h1 className="text-xl font-bold">Gym AI</h1>
-        <p className="text-sm font-light text-gray-400">A Big Stair Product</p>
+        <h1 className="text-xl font-bold">Weights AI</h1>
+        <p className="text-sm font-light text-gray-400">By Big Stair</p>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6">
         {/* <Link

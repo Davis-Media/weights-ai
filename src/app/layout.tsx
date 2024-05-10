@@ -7,7 +7,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
 export const metadata: Metadata = {
-  title: "Matterhorn AI",
+  title: "Weights AI",
   description: "Track your progress with the simplest AI weights tracker",
 };
 

@@ -12,11 +12,9 @@ export default function Component() {
               <div className="flex flex-col justify-center space-y-4 col-span-1">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-6xl/none">
-                    Gym AI
+                    Weights AI
                   </h1>
-                  <h5 className="text-sm text-neutral-500">
-                    A Big Stair Product
-                  </h5>
+                  <h5 className="text-sm text-neutral-500">By Big Stair</h5>
                   <p className="max-w-[600px] text-neutral-700 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
                     Track your weights with an AI assistant. Create your
                     schedule, create your workout, and tell the AI what you are

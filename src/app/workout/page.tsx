@@ -1,5 +1,6 @@
 import WorkoutPage from "@/components/client-pages/workout";
 import { api } from "@/trpc/server";
+import { WorkoutAI } from "./action";
 
 export default async function Page() {
   const currentWorkout = await api.workout.getCurrentWorkout();
@@ -9,8 +10,10 @@ export default async function Page() {
   }
 
   return (
-    <div>
-      <WorkoutPage workoutId={currentWorkout.id} />
-    </div>
+    <WorkoutAI>
+      <div>
+        <WorkoutPage workoutId={currentWorkout.id} />
+      </div>
+    </WorkoutAI>
   );
 }

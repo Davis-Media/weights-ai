@@ -16,6 +16,10 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { CopyCheck, Send, Trash } from "lucide-react";
 import { api } from "@/trpc/react";
+import { useActions, useUIState } from "ai/rsc";
+import { useState } from "react";
+import { WorkoutAI, WorkoutClientMessage } from "@/app/workout/action";
+import { nanoid } from "nanoid";
 
 type WorkoutPageProps = {
   workoutId: string;
@@ -26,6 +30,12 @@ export default function WorkoutPage(props: WorkoutPageProps) {
   const workoutDetailsQuery = api.workout.getFullWorkoutDetails.useQuery({
     workoutId,
   });
+
+  // AI stuff
+  const [input, setInput] = useState<string>("");
+  const [conversation, setConversation] = useUIState<typeof WorkoutAI>();
+  const { sendWorkoutMessage } = useActions();
+  const [isLoading, setIsLoading] = useState(false);
 
   const utils = api.useUtils();
 
@@ -153,37 +163,48 @@ export default function WorkoutPage(props: WorkoutPageProps) {
           </CardFooter>
         </Card>
       </div>
+      <div>
+        {conversation.map((message) => (
+          <div key={message.id}>
+            {message.role}: {message.display}
+          </div>
+        ))}
+      </div>
       <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full px-4">
         <form
           className=" bg-black py-2 px-6 rounded-full flex flex-row gap-4 "
           onSubmit={async (e) => {
-            // e.preventDefault();
-            // setIsLoading(true);
-            // // Add user message to UI state
-            // setMessages((currentMessages) => [
-            //   ...currentMessages,
-            //   {
-            //     id: Date.now(),
-            //     display: <UserMessage message={inputValue} />,
-            //   },
-            // ]);
-            // // Submit and get response message
-            // const responseMessage = await submitUserMessage(inputValue);
-            // setMessages((currentMessages) => [
-            //   ...currentMessages,
-            //   responseMessage,
-            // ]);
-            // setIsLoading(false);
-            // setInputValue("");
+            e.preventDefault();
+            setIsLoading(true);
+            // Add user message to UI state
+
+            setConversation((currentConversation) => [
+              ...currentConversation,
+              { id: nanoid(), role: "user", display: input },
+            ]);
+
+            const message = await sendWorkoutMessage(input);
+
+            setConversation((currentConversation) => [
+              ...currentConversation,
+              message,
+            ]);
+
+            setIsLoading(false);
+            setInput("");
           }}
         >
           <Input
             placeholder="Manage your workout..."
             className="border-0 text-white"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={isLoading}
           />
           <Button
             type="submit"
             className="bg-white text-slate-800 hover:bg-slate-200"
+            disabled={isLoading}
           >
             <Send className="w-5 h-5" />
           </Button>

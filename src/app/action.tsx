@@ -1,18 +1,11 @@
 import "server-only";
-import {
-  createAI,
-  createStreamableUI,
-  getMutableAIState,
-  streamUI,
-} from "ai/rsc";
+import { createAI, getMutableAIState, streamUI } from "ai/rsc";
 import z from "zod";
 import CreateWorkoutCard from "@/components/workout/CreateWorkoutCard";
 import { SystemMessage } from "@/components/Messages";
 import ViewAllWorkouts from "@/components/workout/ViewAllWorkouts";
 import { AddExerciseCardServer } from "@/components/exercise/AddExerciseCardServer";
 import { WorkoutBreakdown } from "@/components/workout/WorkoutBreakdown";
-import { Suspense } from "react";
-import { TestRSC } from "@/components/TestRSC";
 import CompleteWorkoutCard from "@/components/workout/CompleteWorkoutCard";
 import { getInProgressWorkout } from "@/server/helper/workout";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
@@ -80,28 +73,12 @@ async function submitUserMessage(userInput: string) {
         description:
           "Call this function when the user types 'demo' this is for debugging",
         parameters: z.object({}),
-        generate: async () => {
-          // aiState.done([
-          //   ...aiState.get(),
-          //   {
-          //     role: "function",
-          //     name: "rsc_demo",
-          //     content: "the user called rsc_demo, this is a debugging function",
-          //   },
-          // ]);
-
-          // const streamUI = createStreamableUI(<div>test start</div>);
-
-          // streamUI.update(
-          //   <div>
-          //     <h2>this does work?</h2>
-          //     <Suspense fallback={<div>LOADING TEST RSC?!?!?!?</div>}>
-          //       <TestRSC />
-          //     </Suspense>
-          //   </div>
-          // );
-
-          return <div>Hey there</div>;
+        generate: async function* () {
+          yield <div>Cloning repository DEMO...</div>;
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          yield <div>Building repository DEMO...</div>;
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          return <div>DEMO deployed!</div>;
         },
       },
       view_current_workout: {

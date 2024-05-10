@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
   const { data: result, error } = await supabase
     .rpc("query_embeddings_user_exercise", {
       search_embedding: JSON.stringify(embedding),
-      match_threshold: 0.8,
+      match_threshold: 0.6,
       search_profile_id: profile_id,
     })
     .select("name, id")

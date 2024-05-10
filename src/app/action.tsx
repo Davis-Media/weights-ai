@@ -1,10 +1,9 @@
 import "server-only";
-import { OpenAI } from "openai";
 import {
   createAI,
   createStreamableUI,
   getMutableAIState,
-  render,
+  streamUI,
 } from "ai/rsc";
 import z from "zod";
 import CreateWorkoutCard from "@/components/workout/CreateWorkoutCard";
@@ -21,10 +20,7 @@ import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { env } from "@/env";
 import { api } from "@/trpc/server";
-
-const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY,
-});
+import { groq, openai } from "@/server/ai";
 
 async function submitUserMessage(userInput: string) {
   "use server";
@@ -60,21 +56,13 @@ async function submitUserMessage(userInput: string) {
     },
   ]);
 
-  // TODO: replace this with streamUI
-  const ui = render({
-    model: "gpt-3.5-turbo",
-    provider: openai,
-    messages: [
-      {
-        role: "system",
-        content: `\
-        You are a personal weights tracker for the gym. You can be asked to start workouts, and to record information for a users sets.
-  If you can't find an appropriate function, tell the user to ask
-  a different question.
-    `,
-      },
-      { role: "user", content: userInput },
-    ],
+  const result = await streamUI({
+    model: openai("gpt-3.5-turbo"),
+    // it don't work right now, but at some point I do want to try
+    // model: groq("llama3-8b-8192"),
+    prompt: userInput,
+    system:
+      "You are a personal weights tracker for the gym. You can be asked to start workouts, and to record information for a users sets. If you can't find an appropriate function, tell the user to ask a different question.",
     text: ({ content, done }) => {
       if (done) {
         aiState.done([
@@ -92,37 +80,35 @@ async function submitUserMessage(userInput: string) {
         description:
           "Call this function when the user types 'demo' this is for debugging",
         parameters: z.object({}),
-        render: async function* () {
-          aiState.done([
-            ...aiState.get(),
-            {
-              role: "function",
-              name: "rsc_demo",
-              content: "the user called rsc_demo, this is a debugging function",
-            },
-          ]);
+        generate: async () => {
+          // aiState.done([
+          //   ...aiState.get(),
+          //   {
+          //     role: "function",
+          //     name: "rsc_demo",
+          //     content: "the user called rsc_demo, this is a debugging function",
+          //   },
+          // ]);
 
-          const streamUI = createStreamableUI(<div>test start</div>);
+          // const streamUI = createStreamableUI(<div>test start</div>);
 
-          streamUI.update(
-            <div>
-              <h2>this does work?</h2>
-              <Suspense fallback={<div>LOADING TEST RSC?!?!?!?</div>}>
-                <TestRSC />
-              </Suspense>
-            </div>
-          );
+          // streamUI.update(
+          //   <div>
+          //     <h2>this does work?</h2>
+          //     <Suspense fallback={<div>LOADING TEST RSC?!?!?!?</div>}>
+          //       <TestRSC />
+          //     </Suspense>
+          //   </div>
+          // );
 
-          return streamUI.value;
+          return <div>Hey there</div>;
         },
       },
       view_current_workout: {
         description:
           "Allows the user to view their current workout and its information",
         parameters: z.object({}),
-        render: async function* () {
-          yield <div>fetching...</div>;
-
+        generate: async () => {
           aiState.done([
             ...aiState.get(),
             {
@@ -181,7 +167,7 @@ async function submitUserMessage(userInput: string) {
               .describe("The amount of weight that the user did"),
           })
           .required(),
-        render: async function* (props) {
+        generate: async function* (props) {
           yield <div>fetching...</div>;
 
           // check if there is a current workout
@@ -271,7 +257,7 @@ async function submitUserMessage(userInput: string) {
         description:
           "Allow the user to view all of their past workouts in a nice table",
         parameters: z.object({}),
-        render: async function* () {
+        generate: async function* () {
           yield <div>fetching...</div>;
 
           aiState.done([
@@ -299,7 +285,7 @@ async function submitUserMessage(userInput: string) {
       complete_workout: {
         description: "Allow the user to finish/complete their workout",
         parameters: z.object({}),
-        render: async function* () {
+        generate: async function* () {
           yield <div>fetching...</div>;
 
           const curWorkout = await getInProgressWorkout();
@@ -346,7 +332,7 @@ async function submitUserMessage(userInput: string) {
         description:
           "Provide the user with the UI to create a new workout, this is NOT for when the user wants to add an exercise like bench press",
         parameters: z.object({}),
-        render: async function* () {
+        generate: async function* () {
           yield <div>LOADING...</div>;
 
           aiState.done([
@@ -372,7 +358,7 @@ async function submitUserMessage(userInput: string) {
       get_todays_schedule: {
         description: "Allow the user to view their schedule for today",
         parameters: z.object({}),
-        render: async function* () {
+        generate: async function* () {
           yield <div>fetching...</div>;
 
           aiState.done([
@@ -412,7 +398,7 @@ async function submitUserMessage(userInput: string) {
         description:
           "Allow the user to manage their schedule, set which exercises they want to do on each day of the week",
         parameters: z.object({}),
-        render: async function* () {
+        generate: async function* () {
           yield <div>LOADING...</div>;
 
           aiState.done([
@@ -437,9 +423,10 @@ async function submitUserMessage(userInput: string) {
       },
     },
   });
+
   return {
     id: Date.now(),
-    display: ui,
+    display: result.value,
   };
 }
 

@@ -5,6 +5,7 @@ import { AI } from "./action";
 import { TRPCReactProvider } from "@/trpc/react";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Weights AI",
@@ -24,6 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Analytics />
       <AI>
         <TRPCReactProvider>
           <body

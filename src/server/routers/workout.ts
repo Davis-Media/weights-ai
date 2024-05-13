@@ -33,6 +33,7 @@ export const workoutRouter = createTRPCRouter({
 
     // collapse the sets into a nicer format
     const exercises: {
+      id: string;
       name: string;
       keySetInfo: string; // ex. 225 x 5 x 5
       sets: {
@@ -54,6 +55,7 @@ export const workoutRouter = createTRPCRouter({
         exercises.push({
           name: userExercise.name,
           keySetInfo: `${set.weight} x 1 x ${set.reps} `,
+          id: userExercise.id,
           sets: [{
             weight: set.weight,
             reps: set.reps,

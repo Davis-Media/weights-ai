@@ -17,9 +17,11 @@ import { Input } from "@/components/ui/input";
 import { CopyCheck, Send, Trash } from "lucide-react";
 import { api } from "@/trpc/react";
 import { useActions, useUIState } from "ai/rsc";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { WorkoutAI } from "@/app/workout/action";
 import { nanoid } from "nanoid";
+import { UserMessage } from "../Messages";
+import { redirect, useRouter } from "next/navigation";
 
 type WorkoutPageProps = {
   workoutId: string;
@@ -39,9 +41,33 @@ export default function WorkoutPage(props: WorkoutPageProps) {
 
   const utils = api.useUtils();
 
+  const router = useRouter();
+
+  const remainingExercises = useMemo(() => {
+    const remaining: string[] = [];
+    if (workoutDetailsQuery.data && workoutDetailsQuery.data.schedule) {
+      workoutDetailsQuery.data.schedule.userScheduleEntries.forEach((se) => {
+        // check if the exercise has been added
+        const idx = workoutDetailsQuery.data.exercises.findIndex(
+          (ex) => ex.id === se.userExercise.id
+        );
+        if (idx === -1) {
+          remaining.push(se.userExercise.name);
+        }
+      });
+    }
+    return remaining;
+  }, [workoutDetailsQuery.data]);
+
   const duplicateSetMutation = api.sets.duplicateSet.useMutation({
     onSuccess: () => {
       utils.workout.getFullWorkoutDetails.invalidate();
+    },
+  });
+
+  const completeWorkoutMutation = api.workout.completeWorkout.useMutation({
+    onSuccess: () => {
+      router.push("/messages");
     },
   });
 
@@ -81,6 +107,11 @@ export default function WorkoutPage(props: WorkoutPageProps) {
             <Button
               className="text-sm font-bold px-6 py-3 bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors"
               variant="secondary"
+              onClick={() => {
+                completeWorkoutMutation.mutate({
+                  workoutId,
+                });
+              }}
             >
               Finish
             </Button>
@@ -146,7 +177,10 @@ export default function WorkoutPage(props: WorkoutPageProps) {
               <h3>Remaining Exercises for Today:</h3>
 
               <div>
-                {workoutDetailsQuery.data.schedule.userScheduleEntries.map(
+                {remainingExercises.map((e) => (
+                  <div key={e}>{e}</div>
+                ))}
+                {/* {workoutDetailsQuery.data.schedule.userScheduleEntries.map(
                   (se) => {
                     return (
                       <div key={se.id}>
@@ -156,7 +190,7 @@ export default function WorkoutPage(props: WorkoutPageProps) {
                       </div>
                     );
                   }
-                )}
+                )} */}
               </div>
             </div>
           ) : (
@@ -166,12 +200,10 @@ export default function WorkoutPage(props: WorkoutPageProps) {
       </Card>
       <div className="flex flex-col gap-4 justify-start p-4 overflow-scroll row-span-7 no-scrollbar">
         {conversation.map((message) => (
-          <div key={message.id}>
-            {message.role}: {message.display}
-          </div>
+          <div key={message.id}>{message.display}</div>
         ))}
       </div>
-      <div className="w-full row-span-2 flex items-start justify-center py-4">
+      <div className="w-full row-span-2 flex items-start justify-center py-4 ">
         <form
           className=" bg-black py-2 px-6 rounded-full flex flex-row gap-4 w-full"
           onSubmit={async (e) => {
@@ -181,7 +213,11 @@ export default function WorkoutPage(props: WorkoutPageProps) {
 
             setConversation((currentConversation) => [
               ...currentConversation,
-              { id: nanoid(), role: "user", display: input },
+              {
+                id: nanoid(),
+                role: "user",
+                display: <UserMessage message={input} />,
+              },
             ]);
 
             const message = await sendWorkoutMessage(input);
@@ -194,10 +230,9 @@ export default function WorkoutPage(props: WorkoutPageProps) {
             // this is kinda inelegant, but should work MOST of the time
             setTimeout(() => {
               utils.workout.getFullWorkoutDetails.invalidate();
-            }, 2000);
-
-            setIsLoading(false);
-            setInput("");
+              setIsLoading(false);
+              setInput("");
+            }, 2500);
           }}
         >
           <Input

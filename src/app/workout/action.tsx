@@ -7,6 +7,8 @@ import { env } from "@/env";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { SystemMessage } from "@/components/Messages";
 import { api } from "@/trpc/server";
+import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
+import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 
 export interface WorkoutServerMessage {
   role: "user" | "assistant";
@@ -51,10 +53,29 @@ const sendWorkoutMessage = async (
         history.done(newHistory);
       }
 
-      return <div>{content}</div>;
+      return <SystemMessage message={content} needsSep={true} />;
     },
 
     tools: {
+      manage_schedule: {
+        description:
+          "Allow the user to manage their schedule, set which exercises they want to do on each day of the week",
+        parameters: z.object({}),
+        generate: async function* () {
+          yield <div>LOADING...</div>;
+
+          return (
+            <div>
+              <SystemMessage
+                needsSep={false}
+                message="You can set which exercises you want to do on each day of the week, and how many sets you want to do for each exercise."
+              />
+              <ManageSchedule />
+            </div>
+          );
+        },
+      },
+
       add_set: {
         description: "Call this function to add a set to the user's workout",
         parameters: z.object({
@@ -113,7 +134,12 @@ const sendWorkoutMessage = async (
             ],
           });
 
-          return <div>Added {params.exercise}!</div>;
+          return (
+            <SystemMessage
+              message={`Added ${params.exercise}!`}
+              needsSep={true}
+            />
+          );
         },
       },
     },

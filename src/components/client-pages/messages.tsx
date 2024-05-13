@@ -7,6 +7,7 @@ import { SystemMessage, UserMessage } from "@/components/Messages";
 import { CurrentWorkout } from "@/components/workout/CurrentWorkout";
 import { api } from "@/trpc/react";
 import { AI } from "@/app/action";
+import Link from "next/link";
 
 export function MessagesPage({
   isFreeTrial,
@@ -94,34 +95,37 @@ export function MessagesPage({
       <div className="fixed z-30 bottom-12 md:w-1/2 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full px-4">
         <div className="flex flex-row gap-2 overflow-x-scroll no-scrollbar">
           {activeWorkoutQuery.data && (
-            <Button
-              type="button"
-              variant={"outline"}
-              className="border-slate-800 rounded-full"
-              onClick={async (e) => {
-                e.preventDefault();
-                setIsLoading(true);
-                const message = "Show me my current workout's information";
-                // Add user message to UI state
-                setMessages((currentMessages) => [
-                  ...currentMessages,
-                  {
-                    id: Date.now(),
-                    display: <UserMessage message={message} />,
-                  },
-                ]);
-
-                // Submit and get response message
-                const responseMessage = await submitUserMessage(message);
-                setMessages((currentMessages) => [
-                  ...currentMessages,
-                  responseMessage,
-                ]);
-                setIsLoading(false);
-              }}
-            >
-              Active Workout Info
+            <Button>
+              <Link href={"/workout"}>Workout View</Link>
             </Button>
+            // <Button
+            //   type="button"
+            //   variant={"outline"}
+            //   className="border-slate-800 rounded-full"
+            //   onClick={async (e) => {
+            //     e.preventDefault();
+            //     setIsLoading(true);
+            //     const message = "Show me my current workout's information";
+            //     // Add user message to UI state
+            //     setMessages((currentMessages) => [
+            //       ...currentMessages,
+            //       {
+            //         id: Date.now(),
+            //         display: <UserMessage message={message} />,
+            //       },
+            //     ]);
+
+            //     // Submit and get response message
+            //     const responseMessage = await submitUserMessage(message);
+            //     setMessages((currentMessages) => [
+            //       ...currentMessages,
+            //       responseMessage,
+            //     ]);
+            //     setIsLoading(false);
+            //   }}
+            // >
+            //   Active Workout Info
+            // </Button>
           )}
           <Button
             type="button"

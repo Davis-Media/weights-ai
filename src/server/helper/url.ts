@@ -13,6 +13,6 @@ export function getBaseURL(): string {
     // const hostname = window.location.hostname;
     // const isHttps = window.location.protocol.startsWith("https");
     // return `${isHttps ? "https" : "http"}://${hostname}`;
-    return "https://weights-ai.vercel.app";
+    return "https://weights.bigstair.ai";
   }
 }

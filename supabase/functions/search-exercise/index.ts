@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
       search_profile_id: profile_id,
     })
     .select("name, id")
-    .limit(1);
+    .limit(4);
   if (error) {
     return Response.json(error);
   }

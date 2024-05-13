@@ -39,7 +39,7 @@ const sendWorkoutMessage = async (
   const history = getMutableAIState<typeof WorkoutAI>();
 
   // const model = groq("llama3-8b-8192");
-  const model = openai("gpt-3.5-turbo", {});
+  const model = openai("gpt-4o", {});
 
   const result = await streamUI({
     model,

@@ -2,6 +2,8 @@
 
 *A simple, but powerful, fully open source, AI-powered weights tracker application*
 
+**THE LIVE SITE: https://weights.bigstair.ai**
+
 ### What is Weights AI?
 
 A simple weights tracker application that the user can interact with using text and conversation. For example you can say "I just benched a 225x5x5" and it would record that for you, then you can view it later.

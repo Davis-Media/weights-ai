@@ -4,6 +4,7 @@ import { createClient } from "@/server/sb/client";
 import { type User } from "@supabase/supabase-js";
 import { type ReactNode, useEffect, useState } from "react";
 import { Separator } from "./ui/separator";
+import { api } from "@/trpc/react";
 
 export function SystemMessage(props: {
   message: string;
@@ -32,6 +33,8 @@ export function SystemMessage(props: {
 export function UserMessage(props: { message: string }) {
   const [user, setUser] = useState<User | null>(null);
 
+  const profileQuery = api.user.getUserProfile.useQuery();
+
   useEffect(() => {
     const run = async () => {
       const supabase = createClient();
@@ -57,7 +60,11 @@ export function UserMessage(props: { message: string }) {
           alt="User Pic"
         />
         <h2 className="font-bold text-lg text-slate-900">
-          <span>{user?.user_metadata.full_name}</span>
+          <span>
+            {profileQuery.data
+              ? profileQuery.data.firstName + " " + profileQuery.data.lastName
+              : "User"}
+          </span>
         </h2>
       </div>
       <p>{props.message}</p>

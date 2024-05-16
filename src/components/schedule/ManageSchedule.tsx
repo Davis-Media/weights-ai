@@ -128,15 +128,18 @@ function EditDay(props: { scheduleId: string }) {
 
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
 
-  const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
+  const [searchForExerciseResults, setSearchForExerciseResults] = useState<
     {
-      query: exerciseSearchQuery,
+      name: string;
+      id: string;
+    }[]
+  >([]);
+
+  const searchForExerciseMutation = api.exercise.searchForExercise.useMutation({
+    onSuccess: (data) => {
+      setSearchForExerciseResults(data);
     },
-    {
-      initialData: [],
-      enabled: exerciseSearchQuery !== "",
-    }
-  );
+  });
 
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
@@ -267,6 +270,11 @@ function EditDay(props: { scheduleId: string }) {
 
           <div className="relative">
             <h2>Create or Add an Exercise</h2>
+            <p className="text-neutral-600 text-sm italic">
+              Hit search to find the exercise if you have it in your library (I
+              know it sucks, but it&apos;s a work in progress we&apos;ll get
+              there)
+            </p>
             <Input
               placeholder="Bench"
               onChange={(e) => {
@@ -275,42 +283,43 @@ function EditDay(props: { scheduleId: string }) {
               value={exerciseSearchQuery}
             ></Input>
 
-            {exerciseSearchQuery !== "" && (
-              <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
-                {searchForExerciseQuery.data
-                  .filter(
-                    (v) =>
-                      0 >
-                      selectedExercises.findIndex((findV) => v.id === findV.id)
-                  )
-                  .map((res) => {
-                    return (
-                      <Button
-                        key={res.id}
-                        variant={"ghost"}
-                        className="justify-start"
-                        onClick={() => {
-                          let maxOrder = 0;
-                          selectedExercises.forEach((selEx) => {
-                            if (selEx.order > maxOrder) {
-                              maxOrder = selEx.order;
-                            }
-                          });
-                          setExerciseSearchQuery("");
-                          setSelectedExercises([
-                            ...selectedExercises,
-                            {
-                              id: res.id,
-                              name: res.name,
-                              order: maxOrder + 1,
-                            },
-                          ]);
-                        }}
-                      >
-                        ADD: {res.name}
-                      </Button>
-                    );
-                  })}
+            <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
+              {searchForExerciseResults
+                .filter(
+                  (v) =>
+                    0 >
+                    selectedExercises.findIndex((findV) => v.id === findV.id)
+                )
+                .map((res) => {
+                  return (
+                    <Button
+                      key={res.id}
+                      variant={"ghost"}
+                      className="justify-start"
+                      onClick={() => {
+                        let maxOrder = 0;
+                        selectedExercises.forEach((selEx) => {
+                          if (selEx.order > maxOrder) {
+                            maxOrder = selEx.order;
+                          }
+                        });
+                        setExerciseSearchQuery("");
+                        setSelectedExercises([
+                          ...selectedExercises,
+                          {
+                            id: res.id,
+                            name: res.name,
+                            order: maxOrder + 1,
+                          },
+                        ]);
+                        setSearchForExerciseResults([]);
+                      }}
+                    >
+                      ADD: {res.name}
+                    </Button>
+                  );
+                })}
+              {exerciseSearchQuery !== "" && (
                 <Button
                   variant={"ghost"}
                   className="justify-start"
@@ -323,11 +332,20 @@ function EditDay(props: { scheduleId: string }) {
                     ? "Creating..."
                     : `CREATE: ${exerciseSearchQuery}`}
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="pt-16">
+          <Button
+            onClick={() =>
+              searchForExerciseMutation.mutate({
+                query: exerciseSearchQuery,
+              })
+            }
+          >
+            Search
+          </Button>
           <Button
             onClick={() =>
               updateScheduleMutation.mutate({
@@ -399,14 +417,18 @@ function CreateNewDay(props: { takenDays: number[] }) {
 
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState({ query: "" });
 
-  const searchForExerciseQuery = api.exercise.searchForExercise.useQuery(
-    exerciseSearchQuery,
+  const [searchForExerciseResults, setSearchForExerciseResults] = useState<
     {
-      enabled: exerciseSearchQuery.query !== "",
+      name: string;
+      id: string;
+    }[]
+  >([]);
 
-      initialData: [],
-    }
-  );
+  const searchForExerciseMutation = api.exercise.searchForExercise.useMutation({
+    onSuccess: (data) => {
+      setSearchForExerciseResults(data);
+    },
+  });
 
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
@@ -588,7 +610,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
 
             {exerciseSearchQuery.query !== "" && (
               <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
-                {searchForExerciseQuery.data
+                {searchForExerciseResults
                   .filter(
                     (v) =>
                       0 >
@@ -608,6 +630,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
                             }
                           });
                           setExerciseSearchQuery({ query: "" });
+
                           setSelectedExercises([
                             ...selectedExercises,
                             {
@@ -616,6 +639,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
                               order: maxOrder + 1,
                             },
                           ]);
+                          setSearchForExerciseResults([]);
                         }}
                       >
                         ADD: {res.name}
@@ -640,7 +664,16 @@ function CreateNewDay(props: { takenDays: number[] }) {
             )}
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="pt-16">
+          <Button
+            onClick={() =>
+              searchForExerciseMutation.mutate({
+                query: exerciseSearchQuery.query,
+              })
+            }
+          >
+            Search
+          </Button>
           <Button
             onClick={() => {
               if (selectedDay === null) {

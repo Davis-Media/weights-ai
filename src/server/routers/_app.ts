@@ -6,10 +6,12 @@ import { setsRouter } from "./sets";
 import { workoutRouter } from "./workout";
 import { userRouter } from "./user";
 import { feedbackRouter } from "./feedback";
+import { subscriptionRouter } from "./subscription";
 
 export const appRouter = createTRPCRouter({
   workout: workoutRouter,
   sets: setsRouter,
+  subscription: subscriptionRouter,
   exercise: exerciseRouter,
   schedule: scheduleRouter,
   user: userRouter,

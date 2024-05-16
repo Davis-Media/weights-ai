@@ -30,7 +30,7 @@ export const exerciseRouter = createTRPCRouter({
     return exercises;
   }),
   searchForExercise: authProcedure.input(z.object({ query: z.string() }))
-    .query(
+    .mutation(
       async ({ input, ctx }) => {
         const { query } = input;
 
@@ -51,8 +51,6 @@ export const exerciseRouter = createTRPCRouter({
             }),
           },
         );
-
-        console.log(res);
 
         const data = (await res.json()) as {
           search: string;

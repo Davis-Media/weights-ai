@@ -7,7 +7,6 @@ import { env } from "@/env";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { SystemMessage } from "@/components/Messages";
 import { api } from "@/trpc/server";
-import { OneDaySchedule } from "@/components/schedule/OneDaySchedule";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
 
 export interface WorkoutServerMessage {

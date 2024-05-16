@@ -230,9 +230,10 @@ export default function WorkoutPage(props: WorkoutPageProps) {
             // this is kinda inelegant, but should work MOST of the time
             setTimeout(() => {
               utils.workout.getFullWorkoutDetails.invalidate();
-              setIsLoading(false);
-              setInput("");
-            }, 2500);
+            }, 3000);
+
+            setIsLoading(false);
+            setInput("");
           }}
         >
           <Input

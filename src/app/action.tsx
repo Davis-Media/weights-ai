@@ -14,9 +14,36 @@ import { getOrCreateProfile } from "@/server/helper/auth";
 import { env } from "@/env";
 import { api } from "@/trpc/server";
 import { openai } from "@/server/ai";
+import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "@/server/db";
 
 async function submitUserMessage(userInput: string) {
   "use server";
+
+  // rate limiter
+  const ip = headers().get("X-Forwarded-For") ?? "local"
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(2, "1 s"),
+    analytics: true,
+    /**
+     * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+     * instance with other applications and want to avoid key collisions. The default prefix is
+     * "@upstash/ratelimit"
+     */
+    prefix: "@bigstair/gym",
+  });
+
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return {
+      id: Date.now(),
+      display: <SystemMessage message={"You have been rate limited..."} needsSep={true} />,
+    };
+  }
+
 
   // ensure that the user is logged in
   const { profile, error } = await getOrCreateProfile();
@@ -26,19 +53,6 @@ async function submitUserMessage(userInput: string) {
       display: <SystemMessage message={error} needsSep={true} />,
     };
   }
-
-  if (profile.role === "user") {
-    return {
-      id: Date.now(),
-      display: (
-        <SystemMessage
-          message="Weights AI is not currently available for users. Please contact me for access, or try again later!"
-          needsSep={true}
-        />
-      ),
-    };
-  }
-
   const aiState = getMutableAIState<typeof AI>();
 
   aiState.update([
@@ -418,31 +432,31 @@ export const initialUIState: {
   id: number;
   display: React.ReactNode;
 }[] = [
-  {
-    id: Date.now(),
-    display: (
-      <SystemMessage
-        message=""
-        needsSep={true}
-        richMessage={
-          <div className="flex flex-col gap-2">
-            <p className="text-neutral-900 text-lg italic">
-              Hi! I am a personal workout logging system.
-            </p>
-            <p>Right how I have three main functions:</p>
-            <p className="font-bold">1. Create a new workout</p>
-            <p className="font-bold">2. Add sets to a workout</p>
-            <p className="font-bold">3. Manage your schedule</p>
-            <p>
-              Before you start your workout, you first need to create your
-              schedule, then create your workout, then you are ready to go!
-            </p>
-          </div>
-        }
-      />
-    ),
-  },
-];
+    {
+      id: Date.now(),
+      display: (
+        <SystemMessage
+          message=""
+          needsSep={true}
+          richMessage={
+            <div className="flex flex-col gap-2">
+              <p className="text-neutral-900 text-lg italic">
+                Hi! I am a personal workout logging system.
+              </p>
+              <p>Right how I have three main functions:</p>
+              <p className="font-bold">1. Create a new workout</p>
+              <p className="font-bold">2. Add sets to a workout</p>
+              <p className="font-bold">3. Manage your schedule</p>
+              <p>
+                Before you start your workout, you first need to create your
+                schedule, then create your workout, then you are ready to go!
+              </p>
+            </div>
+          }
+        />
+      ),
+    },
+  ];
 
 export const AI = createAI({
   actions: {

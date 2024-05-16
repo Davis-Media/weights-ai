@@ -5,4 +5,6 @@ import { createOpenAI } from "@ai-sdk/openai";
 //   apiKey: env.GROQ_API_KEY,
 // });
 
-export const openai = createOpenAI();
+export const openai = createOpenAI()
+export const openaiModel = openai("gpt-3.5-turbo")
+export const openaiEmbeddingModel = openai.embedding("text-embedding-ada-002")

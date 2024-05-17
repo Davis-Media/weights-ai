@@ -57,25 +57,34 @@ export type Database = {
           created_at: string
           email: string
           first_name: string
+          free_trial_ends_at: string
           id: string
           last_name: string
+          pro_payment_id: string | null
           role: Database["public"]["Enums"]["role"]
+          stripe_customer_id: string | null
         }
         Insert: {
           created_at: string
           email: string
           first_name: string
+          free_trial_ends_at?: string
           id: string
           last_name: string
+          pro_payment_id?: string | null
           role?: Database["public"]["Enums"]["role"]
+          stripe_customer_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           first_name?: string
+          free_trial_ends_at?: string
           id?: string
           last_name?: string
+          pro_payment_id?: string | null
           role?: Database["public"]["Enums"]["role"]
+          stripe_customer_id?: string | null
         }
         Relationships: []
       }
@@ -126,18 +135,21 @@ export type Database = {
           embedding: string | null
           id: string
           name: string
+          name_openai_embedding: string | null
           profile_id: string
         }
         Insert: {
           embedding?: string | null
           id?: string
           name: string
+          name_openai_embedding?: string | null
           profile_id: string
         }
         Update: {
           embedding?: string | null
           id?: string
           name?: string
+          name_openai_embedding?: string | null
           profile_id?: string
         }
         Relationships: [
@@ -279,6 +291,7 @@ export type Database = {
           embedding: string | null
           id: string
           name: string
+          name_openai_embedding: string | null
           profile_id: string
         }[]
       }

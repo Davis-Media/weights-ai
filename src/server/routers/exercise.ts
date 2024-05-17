@@ -1,9 +1,14 @@
-import { and, eq, like } from "drizzle-orm";
+import { and, eq, like, sql } from "drizzle-orm";
 import { db } from "../db";
-import { profile, set, userExercise } from "../db/schema";
+import { set, userExercise } from "../db/schema";
 import { authProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
+import { embed } from "ai";
+import { openaiEmbeddingModel } from "../ai";
+import { TRPCError } from "@trpc/server";
 import { env } from "@/env";
+import { Database } from "../sb/database.types";
 
 export const exerciseRouter = createTRPCRouter({
   getAllUserExercises: authProcedure.input(z.object({
@@ -31,48 +36,55 @@ export const exerciseRouter = createTRPCRouter({
   }),
   searchForExercise: authProcedure.input(z.object({ query: z.string() }))
     .mutation(
-      async ({ input, ctx }) => {
+      async ({ input }) => {
         const { query } = input;
 
-        // search using the edge function
-        const supabaseURL = env.NEXT_PUBLIC_SUPABASE_URL;
-        const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-        const res = await fetch(
-          `${supabaseURL}/functions/v1/search-exercise`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${supabaseAnonKey}`,
-            },
-            body: JSON.stringify({
-              search: query,
-              profile_id: ctx.profile.id,
-            }),
-          },
-        );
+        const { embedding } = await embed({
+          model: openaiEmbeddingModel,
+          value: query,
+        });
 
-        const data = (await res.json()) as {
-          search: string;
-          result: {
-            name: string;
-            id: string;
-          }[];
-        };
+        const dbExercises = await db.select({
+          name: userExercise.name,
+          id: userExercise.id,
+        }).from(userExercise).orderBy(
+          sql`name_openai_embedding <=> ${
+            JSON.stringify(
+              embedding,
+            )
+          }`,
+        ).limit(3);
 
-        return data.result;
+        return dbExercises;
       },
     ),
-
   createUserExercise: authProcedure.input(z.object({ name: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { name } = input;
 
-      const res = await db.insert(userExercise).values({
-        name,
-        profileId: ctx.profile.id,
-      }).returning({ insertedId: userExercise.id });
+      const { embedding } = await embed({
+        model: openaiEmbeddingModel,
+        value: name,
+      });
 
-      return { id: res[0].insertedId };
+      const sbServerClient = createClient<Database>(
+        env.NEXT_PUBLIC_SUPABASE_URL,
+        env.SUPABASE_SERVICE_ROLE_KEY,
+      );
+
+      const res = await sbServerClient.from("user_exercise").insert({
+        name,
+        profile_id: ctx.profile.id,
+        name_openai_embedding: JSON.stringify(embedding),
+      }).select("id");
+
+      if (res.error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: res.error.message,
+        });
+      }
+
+      return { id: res.data[0].id };
     }),
 });

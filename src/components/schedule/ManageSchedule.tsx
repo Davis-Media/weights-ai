@@ -14,7 +14,7 @@ import { ArrowDown, ArrowUp, Edit, Pen, X } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/trpc/react";
 
 export function ManageSchedule() {
@@ -141,6 +141,29 @@ function EditDay(props: { scheduleId: string }) {
     },
   });
 
+  const timeOutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (exerciseSearchQuery !== "") {
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+
+      timeOutRef.current = setTimeout(async () => {
+        searchForExerciseMutation.mutate({
+          query: exerciseSearchQuery
+        });
+
+      }, 250);
+    } else {
+      setSearchForExerciseResults([]);
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+    }
+  }, [exerciseSearchQuery]);
+
+
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
 
@@ -189,9 +212,8 @@ function EditDay(props: { scheduleId: string }) {
               return (
                 <div
                   key={ex.id}
-                  className={`flex justify-between py-2 px-3 rounded-md items-center ${
-                    i % 2 === 0 && "bg-slate-300"
-                  }`}
+                  className={`flex justify-between py-2 px-3 rounded-md items-center ${i % 2 === 0 && "bg-slate-300"
+                    }`}
                 >
                   <h3 className="text-slate-900 font-bold">{ex.name}</h3>
                   <div className="flex gap-1">
@@ -270,11 +292,7 @@ function EditDay(props: { scheduleId: string }) {
 
           <div className="relative">
             <h2>Create or Add an Exercise</h2>
-            <p className="text-neutral-600 text-sm italic">
-              Hit search to find the exercise if you have it in your library (I
-              know it sucks, but it&apos;s a work in progress we&apos;ll get
-              there)
-            </p>
+
             <Input
               placeholder="Bench"
               onChange={(e) => {
@@ -339,15 +357,6 @@ function EditDay(props: { scheduleId: string }) {
         <DialogFooter className="pt-16">
           <Button
             onClick={() =>
-              searchForExerciseMutation.mutate({
-                query: exerciseSearchQuery,
-              })
-            }
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() =>
               updateScheduleMutation.mutate({
                 name: dayName,
                 exercises: selectedExercises.map((se) => ({
@@ -406,16 +415,16 @@ function CreateNewDay(props: { takenDays: number[] }) {
         ...selectedExercises,
         {
           id: data.id,
-          name: exerciseSearchQuery.query,
+          name: exerciseSearchQuery,
           order: maxOrder + 1,
         },
       ]);
 
-      setExerciseSearchQuery({ query: "" });
+      setExerciseSearchQuery("");
     },
   });
 
-  const [exerciseSearchQuery, setExerciseSearchQuery] = useState({ query: "" });
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState("");
 
   const [searchForExerciseResults, setSearchForExerciseResults] = useState<
     {
@@ -429,6 +438,28 @@ function CreateNewDay(props: { takenDays: number[] }) {
       setSearchForExerciseResults(data);
     },
   });
+
+  const timeOutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (exerciseSearchQuery !== "") {
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+
+      timeOutRef.current = setTimeout(async () => {
+        searchForExerciseMutation.mutate({
+          query: exerciseSearchQuery
+        });
+
+      }, 250);
+    } else {
+      setSearchForExerciseResults([]);
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+    }
+  }, [exerciseSearchQuery]);
 
   const sortedSelectedExercises = useMemo(() => {
     const copy = selectedExercises;
@@ -530,9 +561,8 @@ function CreateNewDay(props: { takenDays: number[] }) {
               return (
                 <div
                   key={ex.id}
-                  className={`flex justify-between py-2 px-3 rounded-md items-center ${
-                    i % 2 === 0 && "bg-slate-300"
-                  }`}
+                  className={`flex justify-between py-2 px-3 rounded-md items-center ${i % 2 === 0 && "bg-slate-300"
+                    }`}
                 >
                   <h3 className="text-slate-900 font-bold">{ex.name}</h3>
                   <div className="flex gap-1">
@@ -603,12 +633,12 @@ function CreateNewDay(props: { takenDays: number[] }) {
             <Input
               placeholder="Bench"
               onChange={(e) => {
-                setExerciseSearchQuery({ query: e.target.value });
+                setExerciseSearchQuery(e.target.value);
               }}
-              value={exerciseSearchQuery.query}
+              value={exerciseSearchQuery}
             ></Input>
 
-            {exerciseSearchQuery.query !== "" && (
+            {exerciseSearchQuery !== "" && (
               <div className="absolute mt-2 w-full flex flex-col bg-white rounded-md shadow-md">
                 {searchForExerciseResults
                   .filter(
@@ -629,7 +659,7 @@ function CreateNewDay(props: { takenDays: number[] }) {
                               maxOrder = selEx.order;
                             }
                           });
-                          setExerciseSearchQuery({ query: "" });
+                          setExerciseSearchQuery("");
 
                           setSelectedExercises([
                             ...selectedExercises,
@@ -652,28 +682,19 @@ function CreateNewDay(props: { takenDays: number[] }) {
                   disabled={createExerciseMutation.isPending}
                   onClick={() =>
                     createExerciseMutation.mutate({
-                      name: exerciseSearchQuery.query,
+                      name: exerciseSearchQuery,
                     })
                   }
                 >
                   {createExerciseMutation.isPending
                     ? "Creating..."
-                    : `CREATE: ${exerciseSearchQuery.query}`}
+                    : `CREATE: ${exerciseSearchQuery}`}
                 </Button>
               </div>
             )}
           </div>
         </div>
         <DialogFooter className="pt-16">
-          <Button
-            onClick={() =>
-              searchForExerciseMutation.mutate({
-                query: exerciseSearchQuery.query,
-              })
-            }
-          >
-            Search
-          </Button>
           <Button
             onClick={() => {
               if (selectedDay === null) {

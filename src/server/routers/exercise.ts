@@ -36,7 +36,7 @@ export const exerciseRouter = createTRPCRouter({
   }),
   searchForExercise: authProcedure.input(z.object({ query: z.string() }))
     .mutation(
-      async ({ input }) => {
+      async ({ input, ctx }) => {
         const { query } = input;
 
         const { embedding } = await embed({
@@ -47,13 +47,14 @@ export const exerciseRouter = createTRPCRouter({
         const dbExercises = await db.select({
           name: userExercise.name,
           id: userExercise.id,
-        }).from(userExercise).orderBy(
-          sql`name_openai_embedding <=> ${
-            JSON.stringify(
-              embedding,
-            )
-          }`,
-        ).limit(3);
+        }).from(userExercise).where(eq(userExercise.profileId, ctx.profile.id))
+          .orderBy(
+            sql`name_openai_embedding <=> ${
+              JSON.stringify(
+                embedding,
+              )
+            }`,
+          ).limit(3);
 
         return dbExercises;
       },

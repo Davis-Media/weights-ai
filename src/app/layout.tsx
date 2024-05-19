@@ -6,6 +6,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
+import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Weights AI",
@@ -34,7 +35,7 @@ export default function RootLayout({
             <NavBar />
             {/* scuffed as all hell, but whatever */}
             {children}
-            <footer>this is a footer</footer>
+            <Footer />
           </body>
         </TRPCReactProvider>
       </AI>

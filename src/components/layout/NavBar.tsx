@@ -33,7 +33,7 @@ export const NavBar = () => {
           <h1 className="md:text-xl font-bold">Weights AI</h1>
           <p className="text-sm font-light text-gray-400">By Big Stair</p>
         </Link>
-        <Button variant={"ghost"} onClick={() => setIsOpen(!isOpen)}>
+        <Button variant={"ghost"} onClick={() => setIsOpen(!isOpen)} className=" md:hidden">
           <Menu className="h-5 w-5" />
         </Button>
       </div>

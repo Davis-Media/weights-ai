@@ -16,9 +16,10 @@ export default function Component() {
                   </h1>
                   <h5 className="text-sm text-neutral-500">By Big Stair</h5>
                   <p className="max-w-[600px] text-neutral-700 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                    Track your weights with an AI assistant. Create your
-                    schedule, create your workout, and tell the AI what you are
-                    doing.
+                    Track your weights like you&apos;re having a conversation.
+                  </p>
+                  <p className="max-w-[600px] text-neutral-700 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                    <span className="font-bold text-neutral-950">&quot;I just benched 225x5&quot;</span> is all it takes to track your progress.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -58,50 +59,10 @@ export default function Component() {
                   height="315"
                   src="https://www.youtube.com/embed/FOrgMTZI7so?si=ZyyPL611dDCvDyDY"
                   title="YouTube video player"
-                  frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
                 ></iframe>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                Features
-              </h2>
-              <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                The app comes with a range of features to make tracking your
-                progress easy.
-              </p>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <div className="grid gap-1">
-                <h3 className="text-lg font-bold">Personalized Insights</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  COMING SOON
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <h3 className="text-lg font-bold">Real-time Tracking</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Enter your weight each day and see your progress over time.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <h3 className="text-lg font-bold">Goal Setting</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  COMING SOON
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <h3 className="text-lg font-bold">Schedule</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Schedule out your workouts and track your progress.
-                </p>
               </div>
             </div>
           </div>
@@ -117,6 +78,9 @@ export default function Component() {
                 <span className="font-bold">forever</span> with a one time
                 purchase of $49.99.
               </p>
+              <p className="text-gray-500 md:text-xl dark:text-gray-400">
+                This app is under active development and is still very much in beta. If you have any bugs, feature requests, or questions, please let me know. There are missing pieces, but I am working on it.
+              </p>
               <div>
                 <Link
                   href="/auth/login"
@@ -129,26 +93,7 @@ export default function Component() {
           </div>
         </section>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          © 2024 Big Stair. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-xs hover:underline underline-offset-4"
-            href="https://github.com/bmdavis419/weights-ai"
-            target="_blank"
-          >
-            Github
-          </Link>
-          {/* <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Privacy
-          </Link> */}
-        </nav>
-      </footer>
+
     </div>
   );
 }

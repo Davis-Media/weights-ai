@@ -12,3 +12,4 @@ export default function Page() {
 
     return <Button onClick={() => addEmbeddingsMutation.mutate()} disabled={addEmbeddingsMutation.isPending}>Add Embeddings</Button>
 }
+

@@ -1,13 +1,16 @@
-import { openai } from "@/server/ai";
+import { openai, openaiEmbeddingModel } from "@/server/ai";
 import { createAI, getMutableAIState, streamUI } from "ai/rsc";
 import { ReactNode } from "react";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { env } from "@/env";
 import { getOrCreateProfile } from "@/server/helper/auth";
 import { SystemMessage } from "@/components/Messages";
 import { api } from "@/trpc/server";
 import { ManageSchedule } from "@/components/schedule/ManageSchedule";
+import { embed } from "ai";
+import { db } from "@/server/db";
+import { userExercise } from "@/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export interface WorkoutServerMessage {
   role: "user" | "assistant";
@@ -89,32 +92,25 @@ const sendWorkoutMessage = async (
 
           // figure out the user set id
           // search using the edge function
-          const supabaseURL = env.NEXT_PUBLIC_SUPABASE_URL;
-          const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-          const res = await fetch(
-            `${supabaseURL}/functions/v1/search-exercise`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${supabaseAnonKey}`,
-              },
-              body: JSON.stringify({
-                search: params.exercise,
-                profile_id: profile.id,
-              }),
-            }
-          );
 
-          const data = (await res.json()) as {
-            search: string;
-            result: {
-              name: string;
-              id: string;
-            }[];
-          };
+          const { embedding } = await embed({
+            model: openaiEmbeddingModel,
+            value: params.exercise,
+          });
 
-          if (data.result.length === 0) {
+          const dbExercises = await db.select({
+            name: userExercise.name,
+            id: userExercise.id,
+          }).from(userExercise).where(eq(userExercise.profileId, profile.id))
+            .orderBy(
+              sql`name_openai_embedding <=> ${JSON.stringify(
+                embedding,
+              )
+                }`,
+            ).limit(1);
+
+
+          if (dbExercises.length === 0) {
             return (
               <SystemMessage
                 needsSep={true}
@@ -128,7 +124,7 @@ const sendWorkoutMessage = async (
               {
                 weight: params.weight,
                 reps: params.reps,
-                exerciseId: data.result[0].id,
+                exerciseId: dbExercises[0].id,
               },
             ],
           });

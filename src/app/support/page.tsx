@@ -38,21 +38,17 @@ export default function SupportPage() {
   });
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-6">
+    <div className="grow flex flex-col items-center justify-center gap-6">
       <Card className="mx-auto max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle>Contact Us</CardTitle>
+          <CardTitle>Contact Me</CardTitle>
           <CardDescription>
-            Have a question, idea, or need assistance? Send us an email and we
-            will get back to you as soon as possible.
+            This is a super new project. Have a question, idea, or need assistance? DM me on Twitter, I would love to work with you!
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col items-center justify-center">
-            <div className="text-4xl font-bold">info@acme.com</div>
-            <p className="text-gray-500 dark:text-gray-400">
-              We would love to work with you!
-            </p>
+            <a className="text-4xl font-bold hover:underline" href="https://twitter.com/bmdavis419" target="blank">@bmdavis419</a>
           </div>
         </CardContent>
       </Card>
@@ -61,8 +57,8 @@ export default function SupportPage() {
           <CardTitle>Feedback</CardTitle>
           <CardDescription>
             This is brand new tech, if you have any bugs, feature requests,
-            ideas, or questions, please let us know.{" "}
-            <span className="font-bold">We would love to hear from you!</span>
+            ideas, or questions, please let me know.{" "}
+            <span className="font-bold">I would love to hear from you!</span>
           </CardDescription>
         </CardHeader>
         <CardContent>

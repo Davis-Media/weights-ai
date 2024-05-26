@@ -8,7 +8,6 @@ import {
   text,
   timestamp,
   uuid,
-  varchar,
 } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "pro", "admin"]);
@@ -62,6 +61,47 @@ export const userExerciseRelations = relations(
       }),
     };
   },
+);
+
+export const userRoutine = pgTable("user_routine", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  profileId: uuid("profile_id").notNull().references(() => profile.id),
+});
+
+export const userRoutineRelations = relations(
+  userRoutine,
+  ({ many, one }) => {
+    return {
+      userRoutineEntries: many(userRoutineEntry),
+      profile: one(profile, {
+        fields: [userRoutine.profileId],
+        references: [profile.id],
+      }),
+    };
+  },
+);
+
+export const userRoutineEntry = pgTable("user_routine_entry", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  order: integer("order").notNull(),
+  userRoutineId: uuid("user_routine_id").notNull()
+    .references(() => userRoutine.id),
+  userExerciseId: uuid("user_exercise_id").notNull(),
+});
+
+export const userRoutineEntryRelations = relations(
+  userRoutineEntry,
+  ({ one }) => ({
+    userRoutine: one(userRoutine, {
+      fields: [userRoutineEntry.userRoutineId],
+      references: [userRoutine.id],
+    }),
+    userExercise: one(userExercise, {
+      fields: [userRoutineEntry.userExerciseId],
+      references: [userExercise.id],
+    }),
+  }),
 );
 
 export const userSchedule = pgTable("user_schedule", {
